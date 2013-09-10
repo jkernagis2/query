@@ -12,6 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main();
+void gen_logs();
 
 #endif // LOGS_H
