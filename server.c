@@ -3,7 +3,7 @@
 //                             server.c                                 //
 //  Function definitions for server functions.                          //
 //                                                                      //
-//  Built on                                                                    //
+//                                                                      //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -69,7 +69,6 @@ void connect_daemon(int sock)
 {
    int n;
    char buffer[256];
-      
    memset(buffer, '\0', 256);
    n = read(sock,buffer,255);
    if (n < 0) error("ERROR reading from socket");

@@ -8,6 +8,9 @@
 #ifndef LOGS_H
 #define LOGS_H
 
+#include <time.h>
+#include <stdlib.h>
 
+int main();
 
 #endif // LOGS_H
