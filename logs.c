@@ -6,8 +6,12 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "logs.h"
-
 int main(){
+    gen_logs();
+    return 0;
+}
+
+void gen_logs(){
     int num_lines = 0;
     int machine_num = 0;
     char buffer[14];
@@ -67,4 +71,5 @@ int main(){
     fprintf(fp, "[SYSTEM]::SYSTEM_SHUTDOWN\n");
     fputc('\n',fp);
     fclose(fp);
+    return;
 }

@@ -10,14 +10,11 @@
 
 #include "client.h"
 #include "server.h"
-//#include "logs.h"
+#include "logs.h"
 
 int main(){
-
+    gen_logs();
+    system("grep WARNING machine.1.log > grepo");
     return 0;
-
-
-
-
 
 }
