@@ -21,7 +21,7 @@ void error(char *message);
 
 void connect_daemon(int);
 
-int server_run(int argc, char *argv[]);
+int main(int argc, char *argv[]);
 
 
 #endif // SERVER_H

@@ -7,6 +7,8 @@
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
+#include "server.h"
+
 /* A simple server in the internet domain using TCP
    The port number is passed as an argument */
 
@@ -18,7 +20,7 @@ void error(char *message)
     exit(1);
 }
 
-int server_run(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
      int socket_file_desc, new_socket_file_desc, port_number, clilen, pid;
      struct sockaddr_in server_address, client_address;
@@ -50,7 +52,7 @@ int server_run(int argc, char *argv[])
              error("ERROR on fork");
          if (pid == 0)  {
              close(socket_file_desc);
-             dostuff(new_socket_file_desc);
+             connect_daemon(new_socket_file_desc);
              exit(0);
          }
          else close(new_socket_file_desc);
