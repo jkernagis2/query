@@ -8,9 +8,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "client.h"
-#include "server.h"
-#include "logs.h"
+//#include "client.h"
+//#include "server.h"
+#include "logs.c"
 
 int main(){
     gen_logs();
