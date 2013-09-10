@@ -5,12 +5,13 @@
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
-
+#include "logs.h"
 
 int main(){
-    int num_lines, machine_num;
+    int num_lines = 0;
+    int machine_num = 0;
     char buffer[14];
-    int r;
+    int i,r;
     srand(time(NULL));
     
     printf("How many lines to generate? :::> ");
@@ -18,58 +19,39 @@ int main(){
     printf("What machine am I? :::> ");
     scanf("%d",&machine_num);
 
-    buffer[13] = "\0";
+    buffer[13] = '\0';
     sprintf(buffer,"machine.%d.log",machine_num);
-    FILE* log = fopen(buffer,'w');
+    FILE* log = fopen(buffer,"w");
     
     fprintf(fp, "[SYSTEM]::LOGGING_SYSTEM_ONLINE\n");
     
-    for(int i = 0; i < num_lines; i++){
+    for(i = 0; i < num_lines; i++){
         r = rand() % 10;
         switch(r){
             
             case 0:
-                fprintf(fp, "[INFO]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::LOGON\n");
+                fprintf(fp, "%s%d%s", "[INFO]::USER_", rand()%200, "::LOGON\n");
             case 1:
-                fprintf(fp, "[INFO]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::LOGOFF\n");
+                fprintf(fp, "%s%d%s", "[INFO]::USER_", rand()%200, "::LOGOFF\n");
             case 2:
-                fprintf(fp, "[ERROR]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::INVALID_REQUEST\n");
+                fprintf(fp, "%s%d%s", "[ERROR]::USER_", rand()%200, "::INVALID_REQUEST\n");
             case 3:
-                fprintf(fp, "[ERROR]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::CONNECTION_TIMEOUT\n");
+                fprintf(fp, "%s%d%s", "[ERROR]::USER_", rand()%200, "::CONNECTION_TIMEOUT\n");
             case 4:
-                fprintf(fp, "[ERROR]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::SERVER_OVERLOADED\n");
+                fprintf(fp, "%s%d%s", "[ERROR]::USER_", rand()%200, "::SERVER_OVERLOADED\n");
             case 5:
-                fprintf(fp, "[WARNING]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::INVALID_PASSWORD\n");
+                fprintf(fp, "%s%d%s", "[WARNING]::USER_", rand()%200, "::INVALID_PASSWORD\n");
             case 6:
-                fprintf(fp, "[WARNING]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::LOGON_ATTEMPTS_EXCEEDED\n");
+                fprintf(fp, "%s%d%s", "[WARNING]::USER_", rand()%200, "::LOGON_ATTEMPTS_EXCEEDED\n");
             case 7:
-                fprintf(fp, "[WARNING]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::OS_OUT_OF_DATE\n");
+                fprintf(fp, "%s%d%s", "[WARNING]::USER_", rand()%200, "::OS_OUT_OF_DATE\n");
             case 8:
-                fprintf(fp, "[INTRUSION]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::ACCOUNT_COMPROMISED\n");
+                fprintf(fp, "%s%d%s", "[INTRUSION]::USER_", rand()%200, "::ACCOUNT_COMPROMISED\n");
             case 9:
-                fprintf(fp, "[QUERY]::USER_");
-                fputc(rand()%200, fp);
-                fprintf(fp, "::QUERY_RECIEVED\n");
+                fprintf(fp, "%s%d%s", "[QUERY]::USER_", rand()%200, "::QUERY_RECIEVED\n");
         }
     }
-    fputc("\n",fp);
+    fprintf(fp, "[SYSTEM]::SYSTEM_SHUTDOWN\n"
+    fputc('\n',fp);
     fclose(fp);
 }
