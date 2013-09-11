@@ -12,16 +12,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 
 void error(char *message);
 
-void connect_daemon(int);
-
 int main(int argc, char *argv[]);
 
+void connect_daemon(int);
 
 #endif // SERVER_H

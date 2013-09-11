@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
 //                             client.c                                 //
-//  Function definitions for client functions.                           //
+//  Function definitions for client functions.                          //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     }
     portno = atoi(argv[2]);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
+    if (sockfd < 0)
         error("ERROR opening socket");
     server = gethostbyname(argv[1]);
     if (server == NULL) {
@@ -40,17 +40,17 @@ int main(int argc, char *argv[])
 		(char *)server->h_addr,
 		server->h_length);
     serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
+    if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0)
         error("ERROR connecting");
     printf("Please enter the message: ");
 	memset(buffer, '\0', 256);
     fgets(buffer,255,stdin);
     n = write(sockfd,buffer,strlen(buffer));
-    if (n < 0) 
+    if (n < 0)
          error("ERROR writing to socket");
 	memset(buffer, '\0', 256);
     n = read(sockfd,buffer,255);
-    if (n < 0) 
+    if (n < 0)
          error("ERROR reading from socket");
     printf("%s\n",buffer);
     return 0;
