@@ -79,7 +79,7 @@ int main(int num_arguments, char *arguments_buffer[])
         // The handler will handle creating and maintaining the client address book.
         if (pid == 0){
             close(socket_file_desc);
-            connect_daemon(new_socket_file_desc, port_number);
+            connect_daemon(new_socket_file_desc);
             exit(0);
         }else{
             close(new_socket_file_desc);
