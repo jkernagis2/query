@@ -79,7 +79,18 @@ void d_grep(char* command_buffer) {
     sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp");
     printf(system_buffer);
     // Setting whether we want to search the whole line/key/values
-    system_buffer[12] = command_flag;
+    switch(command_flag){
+        case(0):
+            break;
+        case(1):
+            system_buffer[12] = '1';
+            break;
+        case(2):
+            system_buffer[12] = '2';
+            break;
+        default:
+            break;
+    }
 
     // Make the system call to do gawk
     system(system_buffer);
