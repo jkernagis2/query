@@ -15,7 +15,8 @@
 void d_grep(char* command_buffer);
 
 int main(){
-    // Currently calls the log generator, then grep's it for
+    // Currently calls the log generator, then grep's the generated log file for WARNING
+    // Saves d_grep saves results in result.tmp
 
     int machine_num;
 
