@@ -65,10 +65,10 @@ void d_grep(char* command_buffer) {
         i = 6;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc(52 + search_str_size) * sizeof(char));
+    system_buffer = malloc((52 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
-    while(command_buffer[i] != "\0"){
+    while(command_buffer[i] != '\0'){
         gawk_buffer[j] = command_buffer[i];
         i++;
         j++;
