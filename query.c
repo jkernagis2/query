@@ -31,7 +31,7 @@ int main(){
 
 }
 
-void d_grep(char* command_buffer) {
+void d_grep(char* command_buffer, int machine_num) {
 
     int i,j;                      // Index vars
     int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
@@ -61,7 +61,7 @@ void d_grep(char* command_buffer) {
         i = 5;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc((53 + search_str_size) * sizeof(char));
+    system_buffer = malloc((54 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
     while(command_buffer[i] != '\0'){
@@ -72,7 +72,7 @@ void d_grep(char* command_buffer) {
 
     // Generating console command string
     // 14 + search string size + 38 = Size of string output to system
-    sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp\n");
+    sprintf(system_buffer,"%s%s%s%d%s%d%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.",machine_num,".log > result",machine_num,".tmp\n");
     printf(system_buffer);
     // Setting whether we want to search the whole line/key/values
     switch(command_flag){

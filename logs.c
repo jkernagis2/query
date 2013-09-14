@@ -13,73 +13,74 @@ void error(char *msg)
     exit(0);
 }
 
-void gen_logs(int machine_num){
-
+void gen_logs(){
+    
+    // Buffer for the file name so we can dynamically name the file based on machine ID
     char buffer[14];
-
-
-
     buffer[13] = '\0';
     sprintf(buffer,"machine.%d.log",machine_num);
-    FILE* fp = fopen(buffer,"w");
-    fprintf(fp, "SYSTEM:LOGGING SYSTEM ONLINE\n");
-    switch(machine_num){
-        case 1:
-            fprintf(fp, "INFO:USER LOGON\n");
-            fprintf(fp, "INFO:USER LOGOFF\n");
-            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
-            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
-            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
-            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
-            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
-            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
-            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
-            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
-            break;
-        case 2:
-            fprintf(fp, "SYSTEM:LOGGING SYSTEM ONLINE\n");
-            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
-            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
-            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
-            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
-            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
-            fprintf(fp, "INFO:USER LOGON\n");
-            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
-            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
-            fprintf(fp, "INFO:USER LOGOFF\n");
-            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
-            break;
-        case 3:
-            fprintf(fp, "INFO:USER LOGOFF\n");
-            fprintf(fp, "INFO:USER LOGON\n");
-            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
-            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
-            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
-            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
-            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
-            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
-            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
-            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
-            break;
-        case 4:
-            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
-            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
-            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
-            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
-            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
-            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
-            fprintf(fp, "INFO:USER LOGON\n");
-            fprintf(fp, "INFO:USER LOGOFF\n");
-            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
-            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
-            break;
-        default:
-            fclose(fp);
-            error("Please enter a valid machine ID");
-            break;
-    }
-    fprintf(fp, "SYSTEM:SYSTEM SHUTDOWN\n");
-    fputc('\n',fp);
-    fclose(fp);
+    FILE* fp1 = fopen(buffer,"w");
+    sprintf(buffer,"machine.%d.log",machine_num);
+    FILE* fp2 = fopen(buffer,"w");
+    sprintf(buffer,"machine.%d.log",machine_num);
+    FILE* fp3 = fopen(buffer,"w");
+    sprintf(buffer,"machine.%d.log",machine_num);
+    FILE* fp4 = fopen(buffer,"w");
+
+            fprintf(fp1, "INFO:USER_1 LOGON\n");
+            fprintf(fp1, "ERROR:USER_1 INVALID_REQUEST\n");
+            fprintf(fp1, "ERROR:USER_1 CONNECTION_TIMEOUT\n");
+            fprintf(fp1, "INFO:USER_2 LOGON\n");
+            fprintf(fp1, "INFO:USER_3 LOGON\n");
+            fprintf(fp1, "INFO:USER_4 LOGON\n");
+            fprintf(fp1, "ERROR:SERVER OVERLOADED\n");
+            fprintf(fp1, "WARNING:USER_5 INVALID_PASSWORD\n");
+            fprintf(fp1, "WARNING:USER_5 INVALID_PASSWORD\n");
+            fprintf(fp1, "WARNING:USER_5 INVALID_PASSWORD\n");
+            fprintf(fp1, "WARNING:USER_5 LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp1, "INFO:USER_6 LOGON\n");
+            fprintf(fp1, "WARNING:USER_6 OS OUT OF DATE\n");
+            fprintf(fp1, "INTRUSION:USER_6 ACCOUNT COMPROMISED\n");
+            fprintf(fp1, "INFO:USER_6 FORCE DISCONNECT\n");
+            fprintf(fp1, "QUERY:USER_3 QUERY RECIEVED\n");
+            fprintf(fp1, "INFO:USER_2 LOGOFF\n");
+
+            fprintf(fp2, "ERROR:USER_10 CONNECTION_TIMEOUT\n");
+            fprintf(fp2, "WARNING:USER_9 OS OUT OF DATE\n");
+            fprintf(fp2, "INFO:USER_9 FORCE DISCONNECT\n");
+            fprintf(fp2, "ERROR:USER_11 INVALID_REQUEST\n");
+            fprintf(fp2, "ERROR:USER_3 SERVER OVERLOADED\n");
+            fprintf(fp2, "WARNING:USER_13 INVALID_PASSWORD\n");
+            fprintf(fp2, "INFO:USER_13 LOGON\n");
+            fprintf(fp2, "QUERY:USER_13 QUERY RECIEVED\n");
+            fprintf(fp2, "INFO:USER_13 LOGOFF\n");
+
+            fprintf(fp3, "INFO:USER_15 LOGOFF\n");
+            fprintf(fp3, "INFO:USER_23 LOGON\n");
+            fprintf(fp3, "WARNING:USER_24 INVALID_PASSWORD\n");
+            fprintf(fp3, "ERROR:USER_17 INVALID_REQUEST\n");
+            fprintf(fp3, "QUERY:USER_17 QUERY RECIEVED\n");
+            fprintf(fp3, "ERROR:USER_17 CONNECTION_TIMEOUT\n");
+            fprintf(fp3, "ERROR:USER_19 SERVER OVERLOADED\n");
+            fprintf(fp3, "WARNING:USER_24 LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp3, "WARNING:USER_45 OS OUT OF DATE\n");
+            fprintf(fp3, "INFO:USER_45 FORCE DISCONNECT\n");
+            fprintf(fp3, "INTRUSION:USER_45 ACCOUNT COMPROMISED\n");
+
+            fprintf(fp4, "ERROR:USER_59 CONNECTION_TIMEOUT\n");
+            fprintf(fp4, "WARNING:USER_78 INVALID_PASSWORD\n");
+            fprintf(fp4, "WARNING:USER_78 LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp4, "INTRUSION:USER_89 ACCOUNT COMPROMISED\n");
+            fprintf(fp4, "ERROR:USER_89 SERVER OVERLOADED\n");
+            fprintf(fp4, "INFO:USER_89 FORCE DISCONNECT\n");
+            fprintf(fp4, "QUERY:USER QUERY RECIEVED\n");
+            fprintf(fp4, "INFO:USER LOGON\n");
+            fprintf(fp4, "INFO:USER_23 LOGOFF\n");
+            fprintf(fp4, "ERROR:USER_99 INVALID_REQUEST\n");
+
+    fclose(fp1);
+    fclose(fp2);
+    fclose(fp3);
+    fclose(fp4);
     return;
 }
