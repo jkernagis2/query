@@ -76,6 +76,7 @@ void gen_logs(int machine_num){
             fprintf(fp, "INFO:USER LOGON\n");
             fprintf(fp, "INFO:USER_23 LOGOFF\n");
             fprintf(fp, "ERROR:USER_99 INVALID_REQUEST\n");
+            break;
         default:
             fclose(fp);
             error("Invalid machine_num");
