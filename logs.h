@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void error(char *msg);
+
 void gen_logs();
 
 #endif // LOGS_H

@@ -7,64 +7,78 @@
 
 #include "logs.h"
 
-void gen_logs(){
-    int num_lines = 0;
-    int machine_num = 0;
-    char buffer[14];
-    int i,r;
-    srand(time(NULL));
+void error(char *msg)
+{
+    perror(msg);
+    exit(0);
+}
 
-    printf("How many lines to generate? :::> ");
-    scanf("%d",&num_lines);
-    printf("What machine am I? :::> ");
-    scanf("%d",&machine_num);
+void gen_logs(int machine_num){
+
+    char buffer[14];
+
+
 
     buffer[13] = '\0';
     sprintf(buffer,"machine.%d.log",machine_num);
     FILE* fp = fopen(buffer,"w");
-
-    fprintf(fp, "[SYSTEM]:LOGGING_SYSTEM_ONLINE:TIME_STAMP-[%d]\n",time(NULL));
-
-    for(i = 0; i < num_lines; i++){
-        r = rand() % 10;
-        switch(r){
-
-            case 0:
-                fprintf(fp, "%s%d%s", "[INFO]:USER_", rand()%200, ":LOGON:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 1:
-                fprintf(fp, "%s%d%s", "[INFO]:USER_", rand()%200, ":LOGOFF:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 2:
-                fprintf(fp, "%s%d%s", "[ERROR]:USER_", rand()%200, ":INVALID_REQUEST:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 3:
-                fprintf(fp, "%s%d%s", "[ERROR]:USER_", rand()%200, ":CONNECTION_TIMEOUT:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 4:
-                fprintf(fp, "%s%d%s", "[ERROR]:USER_", rand()%200, ":SERVER_OVERLOADED:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 5:
-                fprintf(fp, "%s%d%s", "[WARNING]:USER_", rand()%200, ":INVALID_PASSWORD:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 6:
-                fprintf(fp, "%s%d%s", "[WARNING]:USER_", rand()%200, ":LOGON_ATTEMPTS_EXCEEDED:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 7:
-                fprintf(fp, "%s%d%s", "[WARNING]:USER_", rand()%200, ":OS_OUT_OF_DATE:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 8:
-                fprintf(fp, "%s%d%s", "[INTRUSION]:USER_", rand()%200, ":ACCOUNT_COMPROMISED:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            case 9:
-                fprintf(fp, "%s%d%s", "[QUERY]:USER_", rand()%200, ":QUERY_RECIEVED:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-            default:
-                fprintf(fp, "%s%d%s", "[SYSTEM]:WHAT_HAPPENED:TIME_STAMP-[%d]\n",time(NULL));
-                break;
-        }
+    fprintf(fp, "SYSTEM:LOGGING SYSTEM ONLINE\n");
+    switch(machine_num){
+        case 1:
+            fprintf(fp, "INFO:USER LOGON\n");
+            fprintf(fp, "INFO:USER LOGOFF\n");
+            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
+            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
+            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
+            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
+            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
+            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
+            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
+            break;
+        case 2:
+            fprintf(fp, "SYSTEM:LOGGING SYSTEM ONLINE\n");
+            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
+            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
+            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
+            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
+            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
+            fprintf(fp, "INFO:USER LOGON\n");
+            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
+            fprintf(fp, "INFO:USER LOGOFF\n");
+            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
+            break;
+        case 3:
+            fprintf(fp, "INFO:USER LOGOFF\n");
+            fprintf(fp, "INFO:USER LOGON\n");
+            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
+            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
+            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
+            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
+            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
+            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
+            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
+            break;
+        case 4:
+            fprintf(fp, "ERROR:USER CONNECTION_TIMEOUT\n");
+            fprintf(fp, "WARNING:USER INVALID_PASSWORD\n");
+            fprintf(fp, "WARNING:USER LOGON ATTEMPTS EXCEEDED\n");
+            fprintf(fp, "INTRUSION:USER ACCOUNT COMPROMISED\n");
+            fprintf(fp, "ERROR:USER SERVER OVERLOADED\n");
+            fprintf(fp, "QUERY:USER QUERY RECIEVED\n");
+            fprintf(fp, "INFO:USER LOGON\n");
+            fprintf(fp, "INFO:USER LOGOFF\n");
+            fprintf(fp, "ERROR:USER INVALID_REQUEST\n");
+            fprintf(fp, "WARNING:USER OS OUT OF DATE\n");
+            break;
+        default:
+            fclose(fp);
+            error("Please enter a valid machine ID");
+            break;
     }
-    fprintf(fp, "[SYSTEM]:SYSTEM_SHUTDOWN:TIME_STAMP-[%d]\n",time(NULL));
+    fprintf(fp, "SYSTEM:SYSTEM SHUTDOWN\n");
     fputc('\n',fp);
     fclose(fp);
     return;
