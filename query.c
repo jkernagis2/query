@@ -12,6 +12,7 @@
 //#include "server.h"
 #include "logs.c"
 #include <stdlib.h>
+#include <string.h>
 
 //#define SERVER_HARD_ADDRESS "127.0.0.1"
 #define GREP_TEST_TARGET
