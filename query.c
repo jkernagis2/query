@@ -11,6 +11,7 @@
 //#include "client.h"
 //#include "server.h"
 #include "logs.c"
+#include <stdlib.h>
 
 //#define SERVER_HARD_ADDRESS "127.0.0.1"
 #define GREP_TEST_TARGET
@@ -37,7 +38,7 @@ void d_grep(char* command_buffer) {
 
     int i,j;                      // Index vars
     int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
-    int str_size;                 // Size of search string alone
+    int search_str_size;                 // Size of search string alone
     int sys_str_size;                 // Size of search string alone
     char* gawk_buffer;            // Buffer
     char* system_buffer;          // Buffer
@@ -52,7 +53,7 @@ void d_grep(char* command_buffer) {
                 command_flag = 2;
                 break;
             default:
-                perror("Bad flag, defaulting to standard grep.")
+                perror("Bad flag, defaulting to standard grep.");
                 break;
         }
         search_str_size = strlen(command_buffer) - 8; // Size of search expression without "grep -k " or "grep -v "
