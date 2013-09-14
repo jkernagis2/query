@@ -19,10 +19,10 @@ int main(){
     // Saves d_grep saves results in result.tmp
 
     int machine_num;
-
-    printf("What machine am I? :::> ");
-    scanf("%d",&machine_num);
-    gen_logs(machine_num);
+    gen_logs(1);
+    gen_logs(2);
+    gen_logs(3);
+    gen_logs(4);
 
     // Now we do grep/gawk on the file
     d_grep("grep -k WARNING",1);
