@@ -77,7 +77,7 @@ void d_grep(char* command_buffer) {
     // Generating console command string
     // 14 + search string size + 38 = Size of string output to system
     sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp");
-
+    printf(system_buffer);
     // Setting whether we want to search the whole line/key/values
     system_buffer[12] = command_flag;
 
