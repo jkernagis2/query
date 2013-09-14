@@ -45,11 +45,11 @@ void d_grep(char* command_buffer) {
     char* system_buffer;          // Buffer
 
     // Check for flags, hyphen would be after "grep "
-    if(command_buffer[6] == '-'){
-        switch(command_buffer[7]){
+    if(command_buffer[5] == '-'){
+        switch(command_buffer[6]){
             case 'k':
                 command_flag = 1;
-                break;
+                break;quit
             case 'v':
                 command_flag = 2;
                 break;
