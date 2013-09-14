@@ -49,7 +49,7 @@ void d_grep(char* command_buffer) {
         switch(command_buffer[6]){
             case 'k':
                 command_flag = 1;
-                break;
+                break;quit
             case 'v':
                 command_flag = 2;
                 break;
