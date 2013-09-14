@@ -1,0 +1,40 @@
+Set the address the address server is going to be running on.
+This value needs to be defined in <some header file>.
+Set the machine ID's, these values are defined in <some head file>.
+Compile everything.
+---> make clean
+---> make all
+
+Run the address keeping server on one computer.
+---> ./server
+
+Run the clients on each computer.
+---> ./client
+
+You can run a unit test by entering the "/test" command from the server.
+This will send a command to the clients to generate logs based on their machine ID.
+The server will then send a grep request to the clients.  When the results are received,
+the server compares the results to an internally defined answer string and reports success or failure.
+
+COMMAND USAGE
+
+You may do a grep on either the entire log file, line by line as is grep's default, or limit the grep to either the keys or values.
+This is accomplished internally via the gawk command.
+
+From the client, just enter a grep command with your requested patter to do a distributed grep on the log files as a whole.
+
+---> grep REGEXP
+
+Internally we do: system("gawk -F: '$0~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+
+If you wish to only grep the keys, then add the -k flag to your command:
+
+---> grep -k REGEXP
+
+Internally we do: system("gawk -F: '$1~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+
+If you wish to only grep the values, then add the -v flag to your command:
+
+grep -v REGEXP
+
+Internally we do: system("gawk -F: '$2~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
