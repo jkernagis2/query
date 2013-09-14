@@ -65,7 +65,7 @@ void d_grep(char* command_buffer) {
         i = 5;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc((52 + search_str_size) * sizeof(char));
+    system_buffer = malloc((53 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
     while(command_buffer[i] != '\0'){
@@ -76,7 +76,7 @@ void d_grep(char* command_buffer) {
 
     // Generating console command string
     // 14 + search string size + 38 = Size of string output to system
-    sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp");
+    sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp\n");
     printf(system_buffer);
     // Setting whether we want to search the whole line/key/values
     switch(command_flag){
