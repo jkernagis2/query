@@ -83,10 +83,10 @@ void d_grep(char* command_buffer) {
         case(0):
             break;
         case(1):
-            system_buffer[12] = '1';
+            system_buffer[11] = '1';
             break;
         case(2):
-            system_buffer[12] = '2';
+            system_buffer[11] = '2';
             break;
         default:
             break;
