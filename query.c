@@ -8,14 +8,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-//#include "client.h"
-//#include "server.h"
 #include "logs.c"
 #include <stdlib.h>
 #include <string.h>
-
-//#define SERVER_HARD_ADDRESS "127.0.0.1"
-#define GREP_TEST_TARGET
 
 void d_grep(char* command_buffer);
 
@@ -39,8 +34,8 @@ void d_grep(char* command_buffer) {
 
     int i,j;                      // Index vars
     int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
-    int search_str_size;                 // Size of search string alone
-    int sys_str_size;                 // Size of search string alone
+    int search_str_size;          // Size of search string alone
+    int sys_str_size;             // Size of search string alone
     char* gawk_buffer;            // Buffer
     char* system_buffer;          // Buffer
 
@@ -95,6 +90,6 @@ void d_grep(char* command_buffer) {
     // Make the system call to do gawk
     system(system_buffer);
 
-    // Results of the gawk are in results.tmp, ready to be sent out
+    // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
     return;
 }
