@@ -58,11 +58,11 @@ void d_grep(char* command_buffer) {
                 break;
         }
         search_str_size = strlen(command_buffer) - 8; // Size of search expression without "grep -k " or "grep -v "
-        i = 9; // Start of the expression to be grep-ed
+        i = 8; // Start of the expression to be grep-ed
     }else{
         command_flag = 0;
         search_str_size = strlen(command_buffer) - 5; // Size of search expression without "grep -k " or "grep -v "
-        i = 6;
+        i = 5;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
     system_buffer = malloc((52 + search_str_size) * sizeof(char));
