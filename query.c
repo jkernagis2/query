@@ -43,12 +43,12 @@ void d_grep(char* command_buffer) {
     char* system_buffer;          // Buffer
 
     // Check for flags, hyphen would be after "grep "
-    if(*command_buffer[6] == "-"){
-        switch(*command_buffer[7]){
-            case "k":
+    if(command_buffer[6] == '-'){
+        switch(command_buffer[7]){
+            case 'k':
                 command_flag = 1;
                 break;
-            case "v":
+            case 'v':
                 command_flag = 2;
                 break;
             default:
@@ -66,8 +66,8 @@ void d_grep(char* command_buffer) {
     system_buffer = malloc(52 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
-    while(*command_buffer[i] != "\0"){
-        *gawk_buffer[j] = *command_buffer[i];
+    while(command_buffer[i] != "\0"){
+        gawk_buffer[j] = command_buffer[i];
         i++;
         j++;
     }
@@ -77,7 +77,7 @@ void d_grep(char* command_buffer) {
     sprintf(system_buffer,"%s%s%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.1.log > result.tmp");
 
     // Setting whether we want to search the whole line/key/values
-    *system_buffer[12] = command_flag;
+    system_buffer[12] = command_flag;
 
     // Make the system call to do gawk
     system(system_buffer);
