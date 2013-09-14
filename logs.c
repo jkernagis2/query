@@ -18,13 +18,13 @@ void gen_logs(){
     // Buffer for the file name so we can dynamically name the file based on machine ID
     char buffer[14];
     buffer[13] = '\0';
-    sprintf(buffer,"machine.%d.log",machine_num);
+    sprintf(buffer,"machine.%d.log",1);
     FILE* fp1 = fopen(buffer,"w");
-    sprintf(buffer,"machine.%d.log",machine_num);
+    sprintf(buffer,"machine.%d.log",2);
     FILE* fp2 = fopen(buffer,"w");
-    sprintf(buffer,"machine.%d.log",machine_num);
+    sprintf(buffer,"machine.%d.log",3);
     FILE* fp3 = fopen(buffer,"w");
-    sprintf(buffer,"machine.%d.log",machine_num);
+    sprintf(buffer,"machine.%d.log",4);
     FILE* fp4 = fopen(buffer,"w");
 
             fprintf(fp1, "INFO:USER_1 LOGON\n");

@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void d_grep(char* command_buffer);
+void d_grep(char* command_buffer, int machine_num);
 
 int main(){
     // Currently calls the log generator, then grep's the generated log file for WARNING
