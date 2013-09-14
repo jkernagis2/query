@@ -25,7 +25,10 @@ int main(){
     gen_logs(machine_num);
 
     // Now we do grep/gawk on the file
-    d_grep("grep -k WARNING");
+    d_grep("grep -k WARNING",1);
+    d_grep("grep -k WARNING",2);
+    d_grep("grep -k WARNING",3);
+    d_grep("grep -k WARNING",4);
 
     return 0;
 
