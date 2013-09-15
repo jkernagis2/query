@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SEARCH_STRING ^INFO
+
 void d_grep(char* command_buffer, int machine_num);
 
 int main(){
@@ -25,10 +27,10 @@ int main(){
     gen_logs(4);
 
     // Now we do grep/gawk on the file
-    d_grep("grep -k WARNING",1);
-    d_grep("grep -k WARNING",2);
-    d_grep("grep -k WARNING",3);
-    d_grep("grep -k WARNING",4);
+    d_grep("grep -k SEARCH_STRING",1);
+    d_grep("grep -k SEARCH_STRING",2);
+    d_grep("grep -k SEARCH_STRING",3);
+    d_grep("grep -k SEARCH_STRING",4);
 
     verify_logs();
     
