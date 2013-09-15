@@ -26,6 +26,7 @@ struct sockaddr_in servaddr;
 struct sockaddr_in servaddr1;
 struct sockaddr_in servaddr2;
 struct sockaddr_in servaddr3;
+int my_id;
 int sockfd;
 char myIP[NI_MAXHOST];
 pthread_t receive_thread;
