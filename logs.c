@@ -17,14 +17,14 @@ void error_f(char *msg)
 }
 
 void gen_logs(int machine_num){
-    
+
     char buffer[14];    // Buffer for the file name so we can dynamically name the file based on machine ID
     buffer[13] = '\0';
     sprintf(buffer,"machine.%d.log",machine_num); // log name is based on machine ID
     FILE* fp = fopen(buffer,"w");
     int r;
     srand(time(NULL)); // Setup random number generation for picking user numbers
-    
+
     switch(machine_num){
         case 1:
             fprintf(fp, "INFO:USER_1 LOGON\n");
@@ -130,17 +130,31 @@ void gen_logs(int machine_num){
 
 int verify_logs(int test_num){
     char buffer[34];
-    
+    int retval = 0;
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_1 ./result1.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [1] failure.\n",test_num);}
-    
+    if(system(buffer) != 0){
+        printf("Test number [%d], machine [1] failure.\n",test_num);
+        retval--;
+    }
+
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_2 ./result2.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [2] failure.\n",test_num);}
-    
+    if(system(buffer) != 0){
+        printf("Test number [%d], machine [2] failure.\n",test_num);
+        retval--;
+    }
+
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result3.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [3] failure.\n",test_num);}
-    
+    if(system(buffer) != 0){
+        printf("Test number [%d], machine [3] failure.\n",test_num);
+        retval--;
+    }
+
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_4 ./result4.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [4] failure.\n",test_num);}
+    if(system(buffer) != 0){
+        printf("Test number [%d], machine [4] failure.\n",test_num);
+        retval--;
+    }
+
+    return retval;
 
 }
