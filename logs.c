@@ -9,7 +9,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-void error(char *msg)
+
+void error_f(char *msg)
 {
     perror(msg);
     exit(0);
