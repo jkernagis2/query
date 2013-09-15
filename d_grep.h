@@ -7,6 +7,6 @@
 #include <string.h>
 #include <stdio.h>
 
-void d_grep(char* command_buffer, int machine_num);
+void d_grep(char* command_buffer, int machine_num); 
 
 #endif // D_GREP_H
