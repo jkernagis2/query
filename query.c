@@ -30,6 +30,8 @@ int main(){
     d_grep("grep -k WARNING",3);
     d_grep("grep -k WARNING",4);
 
+    verify_logs();
+    
     return 0;
 
 }
