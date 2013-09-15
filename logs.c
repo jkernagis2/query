@@ -140,7 +140,7 @@ int verify_logs(int test_num){
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result3.tmp");
     if(system(buffer) != 0){printf("Test number [%d], machine [3] failure.\n",test_num);}
     
-    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result4.tmp");
+    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_4 ./result4.tmp");
     if(system(buffer) != 0){printf("Test number [%d], machine [4] failure.\n",test_num);}
 
 }
