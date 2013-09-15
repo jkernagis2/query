@@ -15,47 +15,26 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <ifaddrs.h>
+#include <getopt.h>
+#include <arpa/inet.h>
 
-int *mcast_members;
-int mcast_num_members;
-int my_id;
-static int mcast_mem_alloc;
-pthread_mutex_t member_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static int sockfd;
-
+struct sockaddr_in servaddr;
+struct sockaddr_in servaddr1;
+struct sockaddr_in servaddr2;
+struct sockaddr_in servaddr3;
+int sockfd;
+char myIP[NI_MAXHOST];
 pthread_t receive_thread;
-
-/* Add a potential new member to the list */
-void new_member(int member) {
-    int i;
-    pthread_mutex_lock(&member_lock);
-    for (i = 0; i < mcast_num_members; i++) {
-        if (member == mcast_members[i])
-            break;
-    }
-    if (i == mcast_num_members) { /* really is a new member */
-
-        if (mcast_num_members == mcast_mem_alloc) { /* make sure there's enough space */
-            mcast_mem_alloc *= 2;
-            mcast_members = (int *) realloc(mcast_members, mcast_mem_alloc * sizeof(mcast_members[0]));
-            if (mcast_members == NULL) {
-                perror("realloc");
-                exit(1);
-            }
-        }
-        mcast_members[mcast_num_members++] = member;
-        pthread_mutex_unlock(&member_lock);
-    } else {
-        pthread_mutex_unlock(&member_lock);
-    }
-}
 
 void *receive_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
     socklen_t len;
     int nbytes;
+	char rIP[NI_MAXHOST];
     char buf[1000];
+	char *temp;
     mess_s buff;
     int i;
     for (;;) {
@@ -74,142 +53,133 @@ void *receive_thread_main(void *discard) {
         source = ntohs(fromaddr.sin_port);
 
         if (nbytes == 0) {
-            /* A first message from someone */
-            new_member(source);
+
         }
         else {
-            printf("<%d> %s\n", my_id,buf);
+			temp = inet_ntoa(fromaddr.sin_addr); // return the IP
+        	printf("<%s> %s\n", temp,buf);
         }
     }
 }
+void getIP(void) {
+	struct ifaddrs *ifaddr, *ifa;
+	int family, s;
+ 
+
+	if (getifaddrs(&ifaddr) == -1) {
+		perror("getifaddrs");
+		exit(EXIT_FAILURE);
+	}
+
+	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+		family = ifa->ifa_addr->sa_family;
+
+		if (family == AF_INET) {
+			s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), myIP, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+			if (s != 0) {
+					printf("getnameinfo() failed: %s\n", gai_strerror(s));
+					exit(EXIT_FAILURE);
+			}
+			if(strncmp(ifa->ifa_name, "eth0", 4) == 0){
+				printf("My IP: %s\n", myIP);
+			}
+		}
+	}
+}
+void init_others(void){
+
+
+	struct hostent *other;
+	char buffer[NI_MAXHOST];
+	char *temp;
+	int i;
+
+	printf("\nPlease Enter 1st IP ");
+	fgets(buffer, sizeof(buffer), stdin);
+    int len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
+	memset(&servaddr1,0,sizeof(servaddr1));
+	servaddr1.sin_family = AF_INET;
+	inet_aton(buffer, &servaddr1.sin_addr);
+	servaddr1.sin_port = htons(9000); //This is the port for all communicatio
+
+
+	printf("\nPlease Enter 2nd IP ");
+	fgets(buffer, sizeof(buffer), stdin);
+    len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
+	memset(&servaddr2,0,sizeof(servaddr2));
+	servaddr2.sin_family = AF_INET;
+	inet_aton(buffer, &servaddr2.sin_addr);
+	servaddr2.sin_port = htons(9000); //This is the port for all communication
+
+
+	printf("\nPlease Enter 3rd IP ");
+	fgets(buffer, sizeof(buffer), stdin);
+    len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
+	memset(&servaddr3,0,sizeof(servaddr3));
+	servaddr3.sin_family = AF_INET;
+	inet_aton(buffer, &servaddr3.sin_addr);
+	servaddr1.sin_port = htons(9000); //This is the port for all communication
+
+}
+
 
 
 void init(void) {
-    struct sockaddr_in servaddr;
-    socklen_t len;
-    int fd;
-    char buf[128];
+    //int sockfd;
     int i,n;
-
+	int sockoptval = 1;
+	char *temp;
+	getIP();
     /* set up UDP listening socket */
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
     if (sockfd < 0) {
         perror("socket");
         exit(1);
     }
-
+ 	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
     memset(&servaddr,0,sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    servaddr.sin_port=htons(0);     /* let the operating system choose a port for us */
-
+    servaddr.sin_addr.s_addr = inet_addr(myIP);
+	servaddr.sin_port = htons(9000); //This is the port for all communication
     if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         perror("bind");
-        exit(1);
+       exit(1);
     }
-
-    /* obtain a port number */
-    len = sizeof(servaddr);
-    if (getsockname(sockfd, (struct sockaddr *) &servaddr, &len) < 0) {
-        perror("getsockname");
-        exit(1);
-    }
-
-    my_id = ntohs(servaddr.sin_port);
-    fprintf(stderr, "Our port number: %d\n", my_id);
-
-    /* allocate initial member arrary */
-    mcast_mem_alloc = 16;
-    mcast_members = (int *) malloc(sizeof(mcast_members[0]) * mcast_mem_alloc);
-    if (mcast_members == NULL) {
-        perror("malloc");
-        exit(1);
-    }
-    mcast_num_members = 0;
 
     /* start receiver thread to make sure we obtain announcements from anyone who tries to contact us */
     if (pthread_create(&receive_thread, NULL, &receive_thread_main, NULL) != 0) {
         fprintf(stderr, "Error in pthread_create\n");
         exit(1);
     }
-
-    /* add self to group file */
-
-    fd = open(GROUP_FILE, O_WRONLY | O_APPEND | O_CREAT, 0600); /* read-write by the user */
-    if (fd < 0) {
-        perror("open(group file, 'a')");
-        exit(1);
-    }
-
-    if (write(fd, &my_id, sizeof(my_id)) != sizeof(my_id)) {
-        perror("write");
-        exit(1);
-    }
-    close(fd);
-
-
-    /* now read in the group file */
-    fd = open(GROUP_FILE, O_RDONLY);
-    if (fd < 0) {
-        perror("open(group file, 'r')");
-        exit(1);
-    }
-
-     do {
-         int *member;
-         n = read(fd, buf, sizeof(buf));
-         if (n < 0) {
-             break;
-         }
-
-         for (member = (int *) buf; ((char *) member) - buf < n; member++) {
-             new_member(*member);
-         }
-     } while (n == sizeof(buf));
-
-     close(fd);
-
-     /* announce ourselves to everyone */
-
-     pthread_mutex_lock(&member_lock);
-     for (i = 0; i < mcast_num_members; i++) {
-         struct sockaddr_in destaddr;
-
-         if (mcast_members[i] == my_id)
-             continue;  /* don't announce to myself */
-
-         memset(&destaddr, 0, sizeof(destaddr));
-         destaddr.sin_family = AF_INET;
-         destaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-         destaddr.sin_port = htons(mcast_members[i]);
-
-         sendto(sockfd, buf, 0, 0, (struct sockaddr *) &destaddr, sizeof(destaddr));
-     }
-     pthread_mutex_unlock(&member_lock);
+	
+	init_others();
+	
 }
 
 
 void multicast(const char *message) {
     int i;
+	char *temp;
     mess_s value;
     strcpy(value.words, message);
 
-    pthread_mutex_lock(&member_lock);
-    for (i = 0; i < mcast_num_members; i++) {
-         struct sockaddr_in destaddr;
+    sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
+	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
+	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
 
-         if (mcast_members[i] == my_id)
-             continue;  /* don't announce to myself */
-
-         memset(&destaddr, 0, sizeof(destaddr));
-         destaddr.sin_family = AF_INET;
-         destaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-         destaddr.sin_port = htons(mcast_members[i]);
-
-         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &destaddr, sizeof(destaddr));
-     }
-    
-    pthread_mutex_unlock(&member_lock);
 }
 
 

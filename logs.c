@@ -15,17 +15,18 @@ void error(char *msg)
 
 void gen_logs(int machine_num){
     
-    // Buffer for the file name so we can dynamically name the file based on machine ID
-    char buffer[14];
+    char buffer[14];    // Buffer for the file name so we can dynamically name the file based on machine ID
     buffer[13] = '\0';
-    sprintf(buffer,"machine.%d.log",machine_num);
+    sprintf(buffer,"machine.%d.log",machine_num); // log name is based on machine ID
     FILE* fp = fopen(buffer,"w");
     int r;
-    srand(time(NULL));
+    srand(time(NULL)); // Setup random number generation for picking user numbers
     
     switch(machine_num){
         case 1:
             fprintf(fp, "INFO:USER_1 LOGON\n");
+            fprintf(fp, "INFO:USER_91 LOGON\n");
+            fprintf(fp, "INFO:USER_90 LOGON\n");
             fprintf(fp, "ERROR:USER_1 INVALID_REQUEST\n");
             fprintf(fp, "%d:%d\n", rand()%999, rand()%999);
             fprintf(fp, "ERROR:USER_1 CONNECTION_TIMEOUT\n");
@@ -44,6 +45,33 @@ void gen_logs(int machine_num){
             fprintf(fp, "INTRUSION:USER_6 ACCOUNT COMPROMISED\n");
             fprintf(fp, "INFO:USER_6 FORCE DISCONNECT\n");
             fprintf(fp, "QUERY:USER_3 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_92 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_12 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_32 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_45 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_56 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_34 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_453 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_76 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_65 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_657 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_764 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_3456 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_345 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_234 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_1234 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_65 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_74 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_345 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_21 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_12 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_23 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_76 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_87 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_23 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_27 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_11 QUERY RECIEVED\n");
+            fprintf(fp, "QUERY:USER_18 QUERY RECIEVED\n");
             fprintf(fp, "INFO:USER_2 LOGOFF\n");
             break;
         case 2:
@@ -98,19 +126,6 @@ void gen_logs(int machine_num){
 }
 
 int verify_logs(){
-    FILE* fp = fopen("temp.tmp","w");
-    fprintf(fp, "INFO:USER_1 LOGON\n");
-    fprintf(fp, "INFO:USER_2 LOGON\n");
-    fprintf(fp, "INFO:USER_3 LOGON\n");
-    fprintf(fp, "INFO:USER_4 LOGON\n");
-    fprintf(fp, "INFO:USER_6 LOGON\n");
-    fprintf(fp, "INFO:USER_6 FORCE DISCONNECT\n");
-    fprintf(fp, "INFO:USER_2 LOGOFF\n");
-    fclose(fp);
-    if(system("cmp result1.tmp temp.tmp") == 0){
-        printf("Success!\n");
-    }else{
-        printf("Failure.\n");
-    }
+
     
 }
