@@ -107,7 +107,7 @@ int verify_logs(){
     fprintf(fp, "INFO:USER_6 FORCE DISCONNECT\n");
     fprintf(fp, "INFO:USER_2 LOGOFF\n");
     fclose(fp);
-    if(system("cmp result1.log temp.tmp") == 0){
+    if(system("cmp result1.tmp temp.tmp") == 0){
         printf("Success!\n");
     }else{
         printf("Failure.\n");
