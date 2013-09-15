@@ -18,6 +18,8 @@
 #include <ifaddrs.h>
 #include <getopt.h>
 #include <arpa/inet.h>
+#include "logs.h"
+#include "d_grep.h"
 
 
 struct sockaddr_in servaddr;
@@ -58,13 +60,21 @@ void *receive_thread_main(void *discard) {
         else {
 			temp = inet_ntoa(fromaddr.sin_addr); // return the IP
         	printf("<%s> %s\n", temp,buf);
+            if(strncmp(buf,"/test",5) == 0){
+            
+                gen_logs(my_id);
+            
+            }else if(strncmp(buf,"grep",4) == 0){
+                d_grep(buf,my_id);
+                // Send resulting file, result<MYID>.tmp to whoever sent us the grep
+            }
         }
     }
 }
 void getIP(void) {
 	struct ifaddrs *ifaddr, *ifa;
 	int family, s;
- 
+
 
 	if (getifaddrs(&ifaddr) == -1) {
 		perror("getifaddrs");
@@ -133,15 +143,14 @@ void init_others(void){
 	servaddr1.sin_port = htons(9000); //This is the port for all communication
 
 }
-
-
-
 void init(void) {
     //int sockfd;
     int i,n;
 	int sockoptval = 1;
 	char *temp;
 	getIP();
+    printf("What is my machine ID? ::>  ");
+    scanf("%d",&my_id);
     /* set up UDP listening socket */
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
     if (sockfd < 0) {
@@ -163,12 +172,10 @@ void init(void) {
         fprintf(stderr, "Error in pthread_create\n");
         exit(1);
     }
-	
+
 	init_others();
-	
+
 }
-
-
 void multicast(const char *message) {
     int i;
 	char *temp;
@@ -181,5 +188,3 @@ void multicast(const char *message) {
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
 
 }
-
-
