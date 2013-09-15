@@ -27,10 +27,10 @@ int main(){
     gen_logs(4);
 
     // Now we do grep/gawk on the file
-    d_grep("grep -k SEARCH_STRING",1);
-    d_grep("grep -k SEARCH_STRING",2);
-    d_grep("grep -k SEARCH_STRING",3);
-    d_grep("grep -k SEARCH_STRING",4);
+    d_grep("grep -k "SEARCH_STRING,1);
+    d_grep("grep -k "SEARCH_STRING,2);
+    d_grep("grep -k "SEARCH_STRING,3);
+    d_grep("grep -k "SEARCH_STRING,4);
 
     verify_logs();
     
