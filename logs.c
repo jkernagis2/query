@@ -6,7 +6,9 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "logs.h"
-
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 void error(char *msg)
 {
     perror(msg);

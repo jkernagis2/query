@@ -1,4 +1,5 @@
-
+#include <stdlib.h>
+#include <string.h>
 
 void d_grep(char* command_buffer, int machine_num) {
 
