@@ -132,15 +132,15 @@ int verify_logs(int test_num){
     char buffer[34];
     
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_1 ./result1.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [1] failure.",test_num);}
+    if(system(buffer) != 0){printf("Test number [%d], machine [1] failure.\n",test_num);}
     
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_2 ./result2.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [2] failure.",test_num);}
+    if(system(buffer) != 0){printf("Test number [%d], machine [2] failure.\n",test_num);}
     
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result3.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [3] failure.",test_num);}
+    if(system(buffer) != 0){printf("Test number [%d], machine [3] failure.\n",test_num);}
     
     sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result4.tmp");
-    if(system(buffer) != 0){printf("Test number [%d], machine [4] failure.",test_num);}
+    if(system(buffer) != 0){printf("Test number [%d], machine [4] failure.\n",test_num);}
 
 }
