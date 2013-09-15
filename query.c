@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SEARCH_STRING ^INFO
+#define SEARCH_STRING "^INFO"
 
 void d_grep(char* command_buffer, int machine_num);
 
