@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void error(char *msg);
+void error_f(char *msg);
 
 void gen_logs();
 

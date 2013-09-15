@@ -118,7 +118,7 @@ void gen_logs(int machine_num){
             break;
         default:
             fclose(fp);
-            error("Invalid machine_num");
+            error_f("Invalid machine_num");
             break;
     }
     fclose(fp);
