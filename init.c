@@ -115,7 +115,7 @@ void init_others(void){
 	memset(&servaddr1,0,sizeof(servaddr1));
 	servaddr1.sin_family = AF_INET;
 	inet_aton(buffer, &servaddr1.sin_addr);
-	servaddr1.sin_port = htons(9000); //This is the port for all communicatio
+	servaddr1.sin_port = htons(9000); //This is the port for all communication
 
 
 	printf("\nPlease Enter 2nd IP. ::> ");
