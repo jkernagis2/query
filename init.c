@@ -105,7 +105,7 @@ void init_others(void){
 	char *temp;
 	int i;
 
-	printf("\nPlease Enter 1st IP ");
+	printf("\nPlease Enter 1st IP. ::> ");
 	fgets(buffer, sizeof(buffer), stdin);
     int len = strlen(buffer);
      /* trim newline */
@@ -118,7 +118,7 @@ void init_others(void){
 	servaddr1.sin_port = htons(9000); //This is the port for all communicatio
 
 
-	printf("\nPlease Enter 2nd IP ");
+	printf("\nPlease Enter 2nd IP. ::> ");
 	fgets(buffer, sizeof(buffer), stdin);
     len = strlen(buffer);
      /* trim newline */
@@ -131,7 +131,7 @@ void init_others(void){
 	servaddr2.sin_port = htons(9000); //This is the port for all communication
 
 
-	printf("\nPlease Enter 3rd IP ");
+	printf("\nPlease Enter 3rd IP. ::> ");
 	fgets(buffer, sizeof(buffer), stdin);
     len = strlen(buffer);
      /* trim newline */
@@ -191,5 +191,6 @@ void multicast(const char *message) {
     if(strncmp(message,"/test",5)==0){
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
+        
     }
 }
