@@ -66,6 +66,7 @@ void *receive_thread_main(void *discard) {
             
             }else if(strncmp(buf,"grep",4) == 0){
                 d_grep(buf,my_id);
+                
                 // Send resulting file, result<MYID>.tmp to whoever sent us the grep
             }
         }
@@ -148,9 +149,10 @@ void init(void) {
     int i,n;
 	int sockoptval = 1;
 	char *temp;
+    char trashinput;
 	getIP();
     printf("What is my machine ID? ::>  ");
-    scanf("%d",&my_id);
+    scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
     /* set up UDP listening socket */
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
     if (sockfd < 0) {
@@ -186,5 +188,8 @@ void multicast(const char *message) {
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
-
+    if(strncmp(message,"/test",5)==0){
+        // We sent the /test command to the others so they generated log files
+        // Now we need to do a few greps and verify that the results we get back are correct
+    }
 }
