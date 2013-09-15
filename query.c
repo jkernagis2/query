@@ -44,17 +44,17 @@ int main(){
     
     verify_logs(2);
     
-    d_grep("grep -k "SEARCH_STRING_3,1);
-    d_grep("grep -k "SEARCH_STRING_3,2);
-    d_grep("grep -k "SEARCH_STRING_3,3);
-    d_grep("grep -k "SEARCH_STRING_3,4);
+    d_grep("grep -v "SEARCH_STRING_3,1);
+    d_grep("grep -v "SEARCH_STRING_3,2);
+    d_grep("grep -v "SEARCH_STRING_3,3);
+    d_grep("grep -v "SEARCH_STRING_3,4);
     
     verify_logs(3);
     
-    d_grep("grep -k "SEARCH_STRING_4,1);
-    d_grep("grep -k "SEARCH_STRING_4,2);
-    d_grep("grep -k "SEARCH_STRING_4,3);
-    d_grep("grep -k "SEARCH_STRING_4,4);
+    d_grep("grep -v "SEARCH_STRING_4,1);
+    d_grep("grep -v "SEARCH_STRING_4,2);
+    d_grep("grep -v "SEARCH_STRING_4,3);
+    d_grep("grep -v "SEARCH_STRING_4,4);
     
     verify_logs(4);
     

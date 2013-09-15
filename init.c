@@ -192,5 +192,7 @@ void multicast(const char *message) {
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
         
+    }else if(strncmp(message,"grep",4) == 0){
+        // Need to wait for results files to get sent to us, how do we know how long to wait?
     }
 }
