@@ -128,7 +128,7 @@ void gen_logs(int machine_num){
     return;
 }
 
-int verify_logs(){
+int verify_logs(int test_num){
 
     
 }

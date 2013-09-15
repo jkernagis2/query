@@ -65,3 +65,52 @@ void d_grep(char* command_buffer, int machine_num) {
     // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
     return;
 }
+
+// Combines the result1.tmp through results4.tmp if present into a single file, grep.output.
+//  Also deletes the temp files when done with them.
+void combine(){
+    FILE* fp1 = fopen("result1.tmp","r");
+    FILE* fp2 = fopen("result2.tmp","r");
+    FILE* fp3 = fopen("result3.tmp","r");
+    FILE* fp4 = fopen("result4.tmp","r");
+    FILE* fp5 = fopen("grep.output","w");
+
+    int check;
+
+    if(fp1 != NULL){
+        fprintf(fp5, "machine.1.log results:\n");
+        while((check = fgetc(fp1)) != EOF){
+            fputc(check,fp5);
+        }
+        fclose(fp1);
+    }
+
+    if(fp2 != NULL){
+        fprintf(fp5, "machine.2.log results:\n");
+        while((check = fgetc(fp2)) != EOF){
+            fputc(check,fp5);
+        }
+        fclose(fp2);
+    }
+
+    if(fp3 != NULL){
+        fprintf(fp3, "machine.3.log results:\n");
+        while((check = fgetc(fp3)) != EOF){
+            fputc(check,fp5);
+        }
+        fclose(fp3);
+    }
+
+    if(fp4 != NULL){
+        fprintf(fp4, "machine.4.log results:\n");
+        while((check = fgetc(fp4)) != EOF){
+            fputc(check,fp5);
+        }
+        fclose(fp4);
+    }
+
+    fclose(fp5);
+}
+
+
+

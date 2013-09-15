@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SEARCH_STRING "^INFO"
+#define SEARCH_STRING_1 "^INFO"
 
 void d_grep(char* command_buffer, int machine_num);
 
@@ -27,12 +27,12 @@ int main(){
     gen_logs(4);
 
     // Now we do grep/gawk on the file
-    d_grep("grep -k "SEARCH_STRING,1);
-    d_grep("grep -k "SEARCH_STRING,2);
-    d_grep("grep -k "SEARCH_STRING,3);
-    d_grep("grep -k "SEARCH_STRING,4);
+    d_grep("grep -k "SEARCH_STRING_1,1);
+    d_grep("grep -k "SEARCH_STRING_1,2);
+    d_grep("grep -k "SEARCH_STRING_1,3);
+    d_grep("grep -k "SEARCH_STRING_1,4);
 
-    verify_logs();
+    verify_logs(1);
     
     return 0;
 

@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 void error_f(char *msg);
-
 void gen_logs();
+int verify_logs(int test_num);
 
 #endif // LOGS_H
