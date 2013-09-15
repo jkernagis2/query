@@ -18,8 +18,7 @@
 #include <ifaddrs.h>
 #include <getopt.h>
 #include <arpa/inet.h>
-#include "logs.h"
-#include "d_grep.h"
+
 
 
 struct sockaddr_in servaddr;

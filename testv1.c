@@ -1,5 +1,7 @@
 #include "shared.h"
 #include "init.h"
+#include "logs.h"
+#include "d_grep.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
