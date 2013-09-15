@@ -1,40 +1,62 @@
-Set the address the address server is going to be running on.
-This value needs to be defined in <some header file>.
-Set the machine ID's, these values are defined in <some head file>.
-Compile everything.
+ECE 428
+MP 1 : Distributed GREP
+Elzabad Kennedy & John Kernagis
+
+Compilation Instructions
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Clean and Compile.
 ---> make clean
----> make all
+---> make
 
-Run the address keeping server on one computer.
----> ./server
+2. Run the program on each computer.
+---> ./<name>
 
-Run the clients on each computer.
----> ./client
+3. Upon running each instance of the program, you will be asked to enter
+    the addresses of the other machines, as well as the machine ID of the
+    current instance.  Please give each machine a unique ID from 1 to 4.
 
-You can run a unit test by entering the "/test" command from the server.
-This will send a command to the clients to generate logs based on their machine ID.
-The server will then send a grep request to the clients.  When the results are received,
-the server compares the results to an internally defined answer string and reports success or failure.
+4. You can run a unit test by entering the "/test" command from any machine.
 
+    This will send a command to the other machines to generate logs based on
+    their machine ID.  The current machine will then send grep requests to the
+    other machines.  When the results are received, the current machine compares
+    the results to an internally defined answer file and reports success or failure.
+
+5. Otherwise, you can use the grep command to perform a distributed search of log
+    files stored on all the machines.  Log files should be named based on machine ID:
+        machine.1.log
+        machine.2.log
+        machine.3.log
+        machine.4.log
+
+    See COMMAND USAGE below for an explanation of the available flags.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 COMMAND USAGE
 
-You may do a grep on either the entire log file, line by line as is grep's default, or limit the grep to either the keys or values.
-This is accomplished internally via the gawk command.
+You may do a grep on either the entire log file, line by line as is grep's default,
+  or limit the grep to either the keys or values.  This is accomplished internally
+  via the gawk command.
 
-From the client, just enter a grep command with your requested patter to do a distributed grep on the log files as a whole.
+From the client, just enter a grep command with your requested pattern to do a
+  distributed grep on the log files as a whole.
 
----> grep REGEXP
+---> grep YOUR_SEARCH_TERM_HERE
 
-Internally we do: system("gawk -F: '$0~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+Internally we do:
+    system("gawk -F: '$0~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
 
 If you wish to only grep the keys, then add the -k flag to your command:
 
----> grep -k REGEXP
+---> grep -k YOUR_SEARCH_TERM_HERE
 
-Internally we do: system("gawk -F: '$1~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+Internally we do:
+    system("gawk -F: '$1~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
 
 If you wish to only grep the values, then add the -v flag to your command:
 
-grep -v REGEXP
+---> grep -v YOUR_SEARCH_TERM_HERE
 
-Internally we do: system("gawk -F: '$2~/STUFF/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+Internally we do:
+    system("gawk -F: '$2~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
