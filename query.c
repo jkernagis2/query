@@ -12,7 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SEARCH_STRING_1 "^INFO"
+#define SEARCH_STRING_1 "^INFO" // key
+#define SEARCH_STRING_2 "^QUERY" // key
+#define SEARCH_STRING_3 "D$" // value
+#define SEARCH_STRING_4 "^USER_3" // value
 
 void d_grep(char* command_buffer, int machine_num);
 
@@ -33,6 +36,27 @@ int main(){
     d_grep("grep -k "SEARCH_STRING_1,4);
 
     verify_logs(1);
+    
+    d_grep("grep -k "SEARCH_STRING_2,1);
+    d_grep("grep -k "SEARCH_STRING_2,2);
+    d_grep("grep -k "SEARCH_STRING_2,3);
+    d_grep("grep -k "SEARCH_STRING_2,4);
+    
+    verify_logs(2);
+    
+    d_grep("grep -k "SEARCH_STRING_3,1);
+    d_grep("grep -k "SEARCH_STRING_3,2);
+    d_grep("grep -k "SEARCH_STRING_3,3);
+    d_grep("grep -k "SEARCH_STRING_3,4);
+    
+    verify_logs(3);
+    
+    d_grep("grep -k "SEARCH_STRING_4,1);
+    d_grep("grep -k "SEARCH_STRING_4,2);
+    d_grep("grep -k "SEARCH_STRING_4,3);
+    d_grep("grep -k "SEARCH_STRING_4,4);
+    
+    verify_logs(4);
     
     return 0;
 
