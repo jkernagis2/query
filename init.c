@@ -245,6 +245,7 @@ void multicast(const char *message) {
         {
         	sleep(10);
         	t+=10;
+            status[my_id-1] = 1; // Our own results should not fail.
         	if (status[0] == 1 && status[1] == 1 && status[2] == 1 && status[3] == 1)
         	{
         		break;
