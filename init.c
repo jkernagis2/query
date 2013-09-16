@@ -243,7 +243,7 @@ void multicast(const char *message) {
         int t =0;
         while(1)
         {
-        	wait(10);
+        	sleep(10);
         	t+=10;
         	if (status[0] == 1 && status[1] == 1 && status[2] == 1 && status[3] == 1)
         	{
