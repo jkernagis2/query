@@ -10,7 +10,7 @@ Compilation Instructions
 ---> make
 
 2. Run the program on each computer.
----> ./<name>
+---> ./distrib_grep
 
 3. Upon running each instance of the program, you will be asked to enter
     the addresses of the other machines, as well as the machine ID of the
