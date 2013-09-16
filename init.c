@@ -40,7 +40,7 @@ void *receive_thread_main(void *discard) {
     char buf[1000];
 	char *temp;
     mess_s buff;
-    char rbufff[1024];
+    char rbuff[1024];
     int i;
     for (;;) {
         int source;
@@ -70,11 +70,11 @@ void *receive_thread_main(void *discard) {
             }
             if(strncmp(buf,"reply",5) == 0){
             	char lft[13];
-            	strcpy(lftt, lf);
+            	strcpy(lft, lf);
                 lft[7] = buff.id;
                 FILE *file_ptr;
                 int b_read;
-                file_ptr = fopen(lftt, "w");
+                file_ptr = fopen(lft, "w");
                 fwrite(buff.message, 1024, i, file_ptr);
                 fclose(file_ptr);
             
@@ -82,21 +82,21 @@ void *receive_thread_main(void *discard) {
             else if(strncmp(buf,"grep",4) == 0){
                 d_grep(buf,my_id);
                 
-                if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_add)
+                if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr)
                 {
                 	char lft[13];
-            		strcpy(lftt, lf);
+            		strcpy(lft, lf);
                 	lft[7] = myc_id;
                 	FILE *file_ptr;
                 	int b_read;
                 	file_ptr = fopen(lft, "r");
                 	mess_s ret; 
-                	strcpy(value.command, "reply");
-                	value.id = myc_id;
+                	strcpy(ret.command, "reply");
+                	ret.id = myc_id;
                 	while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
                 	{
-                		strcpy(value.message, rbuff);
-                		sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                		strcpy(ret.message, rbuff);
+                		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 	}
                 	fclose(file_ptr);
                 	
