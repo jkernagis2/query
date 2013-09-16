@@ -8,8 +8,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 
-#include "logs.c"
-#include "d_grep.c"
+#include "logs.h"
+#include "d_grep.h"
 #include <stdlib.h>
 #include <string.h>
 

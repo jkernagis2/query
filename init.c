@@ -1,5 +1,5 @@
 #include "init.h"
-#include "d_grep.c"
+#include "d_grep.h"
 #include "shared.h"
 
 #include <sys/socket.h>
