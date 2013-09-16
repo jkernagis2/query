@@ -33,11 +33,9 @@ extern int f;
 extern int * errors;
 
 typedef struct {
-   double   value;
-   int   it;
-   int   var1;
-   int   var2;
-   char  words[256];
+	char id;
+	char command[20];
+	char message[1024];
 } mess_s;
 
 /*** internals ***/
