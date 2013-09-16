@@ -37,7 +37,7 @@ int main(){
     d_grep("grep -k "SEARCH_STRING_1,4);
     combine();
     check += verify_logs(1);
-    
+    /*
     d_grep("grep -k "SEARCH_STRING_2,1);
     d_grep("grep -k "SEARCH_STRING_2,2);
     d_grep("grep -k "SEARCH_STRING_2,3);
@@ -57,7 +57,7 @@ int main(){
     d_grep("grep -v "SEARCH_STRING_4,3);
     d_grep("grep -v "SEARCH_STRING_4,4);
     combine();
-    check += verify_logs(4);
+    check += verify_logs(4);*/
     
     if(check == 0){printf("Queries verified!\n");}
     
