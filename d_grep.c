@@ -75,7 +75,7 @@ void combine(){
     FILE* fp4 = fopen("result4.tmp","r");
     FILE* fp5 = fopen("grep.output","w");
 
-    int check;
+    int check = 0;
 
     if(fp1 != NULL){
         fprintf(fp5, "machine.1.log results:\n");
