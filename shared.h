@@ -14,9 +14,5 @@ typedef struct {
 	char message[1024];
 } mess_s;
 
-/*** internals ***/
-
-/* File where the list of current group members is stored */
-#define GROUP_FILE  "GROUPLIST"
 
 #endif
