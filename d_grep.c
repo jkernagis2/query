@@ -59,7 +59,7 @@ void d_grep(char* command_buffer, int machine_num) {
         default:
             break;
     }
-    printf(system_buffer);
+    //printf(system_buffer);
 
     // Make the system call to do gawk
     system(system_buffer);
