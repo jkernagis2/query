@@ -26,24 +26,27 @@ struct sockaddr_in servaddr1;
 struct sockaddr_in servaddr2;
 struct sockaddr_in servaddr3;
 int my_id;
+char myc_id;
 int sockfd;
 char myIP[NI_MAXHOST];
 pthread_t receive_thread;
+char lf[13] = "result<i>.tmp";
 
 void *receive_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
     socklen_t len;
     int nbytes;
-	char rIP[NI_MAXHOST];
+  char rIP[NI_MAXHOST];
     char buf[1000];
 	char *temp;
     mess_s buff;
+    char rbufff[1024];
     int i;
     for (;;) {
         int source;
         len = sizeof(fromaddr);
         nbytes = recvfrom(sockfd,&buff,sizeof(mess_s),0,(struct sockaddr *)&fromaddr,&len);
-        strcpy(buf, buff.words);
+        strcpy(buf, buff.command);
         if (nbytes < 0) {
             if (errno == EINTR)
                 continue;
@@ -64,8 +67,40 @@ void *receive_thread_main(void *discard) {
             
                 gen_logs(my_id);
             
-            }else if(strncmp(buf,"grep",4) == 0){
+            }
+            if(strncmp(buf,"reply",5) == 0){
+            	char lft[13];
+            	strcpy(lftt, lf);
+                lft[7] = buff.id;
+                FILE *file_ptr;
+                int b_read;
+                file_ptr = fopen(lftt, "w");
+                fwrite(buff.message, 1024, i, file_ptr);
+                fclose(file_ptr);
+            
+            }
+            else if(strncmp(buf,"grep",4) == 0){
                 d_grep(buf,my_id);
+                
+                if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_add)
+                {
+                	char lft[13];
+            		strcpy(lftt, lf);
+                	lft[7] = myc_id;
+                	FILE *file_ptr;
+                	int b_read;
+                	file_ptr = fopen(lft, "r");
+                	mess_s ret; 
+                	strcpy(value.command, "reply");
+                	value.id = myc_id;
+                	while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
+                	{
+                		strcpy(value.message, rbuff);
+                		sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                	}
+                	fclose(file_ptr);
+                	
+                }
                 
                 // Send resulting file, result<MYID>.tmp to whoever sent us the grep
             }
@@ -154,6 +189,7 @@ void init(void) {
     printf("What is my machine ID? ::>  ");
     scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
     /* set up UDP listening socket */
+    myc_id = (char)(((int)'0')+my_id);
     sockfd = socket(AF_INET,SOCK_DGRAM,0);
     if (sockfd < 0) {
         perror("socket");
@@ -179,10 +215,9 @@ void init(void) {
 
 }
 void multicast(const char *message) {
-    int i;
-	char *temp;
+	
     mess_s value;
-    strcpy(value.words, message);
+    strcpy(value.command, message);
 
     sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
@@ -192,7 +227,5 @@ void multicast(const char *message) {
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
         
-    }else if(strncmp(message,"grep",4) == 0){
-        // Need to wait for results files to get sent to us, how do we know how long to wait?
     }
 }
