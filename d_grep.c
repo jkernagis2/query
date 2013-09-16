@@ -62,7 +62,9 @@ void d_grep(char* command_buffer, int machine_num) {
 
     // Make the system call to do gawk
     system(system_buffer);
-
+    free(gawk_buffer);
+    free(system_buffer);
+    
     // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
     return;
 }
