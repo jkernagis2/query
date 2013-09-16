@@ -98,7 +98,7 @@ void combine(){
     }
 
     if(fp3 != NULL){
-        fprintf(fp3, "machine.3.log results:\n");
+        fprintf(fp5, "machine.3.log results:\n");
         while((check = fgetc(fp3)) != EOF){
             fputc(check,fp5);
         }
@@ -108,7 +108,7 @@ void combine(){
     }
 
     if(fp4 != NULL){
-        fprintf(fp4, "machine.4.log results:\n");
+        fprintf(fp5, "machine.4.log results:\n");
         while((check = fgetc(fp4)) != EOF){
             fputc(check,fp5);
         }
