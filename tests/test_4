@@ -8,3 +8,5 @@ QUERY:USER_345 QUERY RECIEVED
 QUERY:USER_345 QUERY RECIEVED
 machine.2.log results:
 ERROR:USER_3 SERVER OVERLOADED
+machine.3.log results:
+machine.4.log results:
