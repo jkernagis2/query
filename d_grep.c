@@ -32,7 +32,7 @@ void d_grep(char* command_buffer, int machine_num) {
         i = 5;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc((53 + search_str_size) * sizeof(char));
+    system_buffer = malloc((54 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
     while(command_buffer[i] != '\0'){
