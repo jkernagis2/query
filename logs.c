@@ -129,29 +129,11 @@ void gen_logs(int machine_num){
 }
 
 int verify_logs(int test_num){
-    char buffer[34];
+    char buffer[32];
     int retval = 0;
-    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_1 ./result1.tmp");
+    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num," ./grep.output");
     if(system(buffer) != 0){
-        printf("Test number [%d], machine [1] failure.\n",test_num);
-        retval--;
-    }
-
-    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_2 ./result2.tmp");
-    if(system(buffer) != 0){
-        printf("Test number [%d], machine [2] failure.\n",test_num);
-        retval--;
-    }
-
-    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_3 ./result3.tmp");
-    if(system(buffer) != 0){
-        printf("Test number [%d], machine [3] failure.\n",test_num);
-        retval--;
-    }
-
-    sprintf(buffer,"%s%d%s","cmp ./tests/test_",test_num,"_4 ./result4.tmp");
-    if(system(buffer) != 0){
-        printf("Test number [%d], machine [4] failure.\n",test_num);
+        printf("Test number [%d] failure.\n",test_num);
         retval--;
     }
 
