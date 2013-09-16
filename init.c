@@ -234,6 +234,16 @@ void multicast(const char *message) {
     }else if(strncmp(message,"/test",5)==0){
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
-        
+        int check = 0;
+        multicast("grep -k ^INFO");
+        check += verify_logs(1);
+        multicast("grep -k ^QUERY");
+        check += verify_logs(2);
+        multicast("grep -v D$");
+        check += verify_logs(3);
+        multicast("grep -v ^USER_3");
+        check += verify_logs(4);
+        if(check == 0){printf("Test success!\n");}
+        else{printf("Test failure.\n");}
     }
 }
