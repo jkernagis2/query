@@ -9,9 +9,11 @@ void d_grep(char* command_buffer, int machine_num) {
     int search_str_size;          // Size of search string alone
     int sys_str_size;             // Size of search string alone
     char* gawk_buffer;            // Buffer
-    char* system_buffer;          // Buffer
+    //char* system_buffer;          // Buffer
+    char system_buffer[256];          // Buffer
 
     // Check for flags, hyphen would be after "grep "
+    memset(system_buffer,'\0',256);
     if(command_buffer[5] == '-'){
         switch(command_buffer[6]){
             case 'k':
@@ -32,7 +34,6 @@ void d_grep(char* command_buffer, int machine_num) {
         i = 5;
     }
     gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc((54 + search_str_size) * sizeof(char));
     // Copy over the search expression
     j = 0;
     while(i != strlen(command_buffer)-1){
@@ -63,7 +64,6 @@ void d_grep(char* command_buffer, int machine_num) {
     // Make the system call to do gawk
     system(system_buffer);
     free(gawk_buffer);
-    free(system_buffer);
     
     // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
     return;
