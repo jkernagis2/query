@@ -30,7 +30,7 @@ char myc_id;
 int sockfd;
 char myIP[NI_MAXHOST];
 pthread_t receive_thread;
-char lf[13] = "result<i>.tmp";
+char lf[11] = "resulti.tmp";
 
 void *receive_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
@@ -69,9 +69,9 @@ void *receive_thread_main(void *discard) {
             
             }
             if(strncmp(buf,"reply",5) == 0){
-            	char lft[13];
+            	char lft[11];
             	strcpy(lft, lf);
-                lft[7] = buff.id;
+                lft[6] = buff.id;
                 FILE *file_ptr;
                 int b_read;
                 file_ptr = fopen(lft, "w");
@@ -84,9 +84,9 @@ void *receive_thread_main(void *discard) {
                 
                 if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr)
                 {
-                	char lft[13];
+                	char lft[11];
             		strcpy(lft, lf);
-                	lft[7] = myc_id;
+                	lft[6] = myc_id;
                 	FILE *file_ptr;
                 	int b_read;
                 	file_ptr = fopen(lft, "r");
