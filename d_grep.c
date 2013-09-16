@@ -121,7 +121,7 @@ void combine(){
     }
 
     fclose(fp5);
-    //system("rm result1.tmp result2.tmp result3.tmp result4.tmp");
+    system("rm result1.tmp result2.tmp result3.tmp result4.tmp");
 }
 
 
