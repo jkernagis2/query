@@ -38,7 +38,7 @@ void *receive_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
     socklen_t len;
     int nbytes;
-  char rIP[NI_MAXHOST];
+    char rIP[NI_MAXHOST];
     char buf[1000];
 	char *temp;
     mess_s buff;
@@ -77,7 +77,7 @@ void *receive_thread_main(void *discard) {
                 FILE *file_ptr;
                 int b_read;
                 file_ptr = fopen(lft, "w");
-                fwrite(buff.message, 1024, i, file_ptr);
+                fwrite(buff.message, strlen(buff.message), 1, file_ptr);
                 fclose(file_ptr);
 
             }
