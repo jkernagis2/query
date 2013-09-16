@@ -18,8 +18,6 @@
 #define SEARCH_STRING_3 "D$" // value
 #define SEARCH_STRING_4 "^USER_3" // value
 
-void d_grep(char* command_buffer, int machine_num);
-
 int main(){
     // Currently calls the log generator, then grep's the generated log file for WARNING
     // Saves d_grep saves results in result.tmp
