@@ -83,6 +83,8 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp1);
+    }else{
+        fprintf(fp5, "machine.1.log failure\n");
     }
 
     if(fp2 != NULL){
@@ -91,6 +93,8 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp2);
+    }else{
+        fprintf(fp5, "machine.2.log failure\n");
     }
 
     if(fp3 != NULL){
@@ -99,6 +103,8 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp3);
+    }else{
+        fprintf(fp5, "machine.3.log failure\n");
     }
 
     if(fp4 != NULL){
@@ -107,9 +113,12 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp4);
+    }else{
+        fprintf(fp5, "machine.4.log failure\n");
     }
 
     fclose(fp5);
+    //system("rm result1.tmp result2.tmp result3.tmp result4.tmp");
 }
 
 

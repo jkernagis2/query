@@ -1,4 +1,5 @@
 #include "init.h"
+#include "d_grep.c"
 #include "shared.h"
 
 #include <sys/socket.h>
@@ -223,7 +224,14 @@ void multicast(const char *message) {
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
 	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
-    if(strncmp(message,"/test",5)==0){
+    if(strncmp(message,"grep",4)==0){
+        // *** wait for results to get here
+        
+        // Combine the .tmp results files into grep.output and delete the .tmp files
+        combine();
+        printf("Results recieved. Output located in grep.output.\n");
+        
+    }else if(strncmp(message,"/test",5)==0){
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
         
