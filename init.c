@@ -77,7 +77,7 @@ void *receive_thread_main(void *discard) {
                 FILE *file_ptr;
                 int b_read;
                 file_ptr = fopen(lft, "w");
-                fwrite(buff.message, strlen(buff.message), 1, file_ptr);
+                fwrite(buff.message, message.bytes_sent, 1, file_ptr);
                 fclose(file_ptr);
 
             }
@@ -100,6 +100,7 @@ void *receive_thread_main(void *discard) {
                 	while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
                 	{
                 		strcpy(ret.message, rbuff);
+                        ret.bytes_sent = b_read;
                 		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 	}
                 	fclose(file_ptr);

@@ -12,6 +12,7 @@ typedef struct {
 	int nid;
 	char command[20];
 	char message[1024];
+    int bytes_sent;
 } mess_s;
 
 
