@@ -66,9 +66,9 @@ void *receive_thread_main(void *discard) {
 			temp = inet_ntoa(fromaddr.sin_addr); // return the IP
         	printf("<%s> %s\n", temp,buf);
             if(strncmp(buf,"/test",5) == 0){
-            
+
                 gen_logs(my_id);
-            
+
             }
             else if(strncmp(buf,"reply",5) == 0){
             	char lft[11];
@@ -79,9 +79,9 @@ void *receive_thread_main(void *discard) {
                 file_ptr = fopen(lft, "w");
                 fwrite(buff.message, 1024, i, file_ptr);
                 fclose(file_ptr);
-            
+
             }
-            else if(strncmp(buf,"done",) == 0){
+            else if(strncmp(buf,"done",4) == 0){
             	status[buff.nid - 1] = 1;
             }
             else if(strncmp(buf,"grep",4) == 0){
@@ -105,11 +105,11 @@ void *receive_thread_main(void *discard) {
                 	fclose(file_ptr);
                 	ret.nid = my_id;
                 	strcpy(ret.command, "done");
-                	
-                	
+
+
                 }
                 sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
-                
+
                 // Send resulting file, result<MYID>.tmp to whoever sent us the grep
             }
         }
@@ -223,13 +223,14 @@ void init(void) {
 
 }
 void multicast(const char *message) {
-	
+
+    int i;
     mess_s value;
     strcpy(value.command, message);
     if(strncmp(message,"grep",4)==0){
     	for(i = 0; i<4; i++)
     	{
-    		status[i]=0;	
+    		status[i]=0;
     	}
     }
 
@@ -252,28 +253,28 @@ void multicast(const char *message) {
         	{
         		if(status[0]==0)
         		{
-        			printf("Machine 1 has failed.\n")	
+        			printf("Machine 1 has failed.\n");
         		}
         		if(status[1]==0)
         		{
-        			printf("Machine 2 has failed.\n")	
+        			printf("Machine 2 has failed.\n");
         		}
         		if(status[2]==0)
         		{
-        			printf("Machine 3 has failed.\n")	
+        			printf("Machine 3 has failed.\n");
         		}
         		if(status[3]==0)
         		{
-        			printf("Machine 4 has failed.\n")	
+        			printf("Machine 4 has failed.\n");
         		}
         		break;
         	}
         }
-        
+
         // Combine the .tmp results files into grep.output and delete the .tmp files
         combine();
         printf("Results recieved. Output located in grep.output.\n");
-        
+
     }else if(strncmp(message,"/test",5)==0){
         // We sent the /test command to the others so they generated log files
         // Now we need to do a few greps and verify that the results we get back are correct
