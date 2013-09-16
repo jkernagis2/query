@@ -63,6 +63,8 @@ int main(){
     
     if(check == 0){printf("Queries verified!\n");}
     
+    combine();
+    
     return 0;
 
 }
