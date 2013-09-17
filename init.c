@@ -34,7 +34,6 @@ FILE* fp4;
 int flag,t_flag;
 char myc_id;
 int sockfd;
-//int my_port;
 char myIP[NI_MAXHOST];
 pthread_t receive_thread;
 char lf[11] = "resulti.tmp";
@@ -101,7 +100,7 @@ void *receive_thread_main(void *discard) {
                     d_grep(buf,my_id);                  // Call the d_grep function
                     mess_s ret;                         // make a mess_s struction
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
-                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr || fromaddr.sin_port != servaddr.sin_port){
+                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr){
                         char lft[11];
                         strcpy(lft, lf);
                         lft[6] = myc_id;
@@ -166,64 +165,53 @@ void init_others(void){
 	char buffer[NI_MAXHOST];
 	char *temp;
 	int i;
-	//int tport;					/*For the case of 1 computer with multiple processe*/
-	//char trashinput;				/*For the case of 1 computer with multiple processe*/
-	
-	
+
 	printf("\nPlease Enter 1st IP. ::> ");
-	//printf("\nPlease Enter 1st Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
 	fgets(buffer, sizeof(buffer), stdin);
-	int len = strlen(buffer);
-	/* trim newline */
-	if (buffer[len-1] == '\n') {
-		buffer[len-1] = 0;
-	}
-	//scanf("%d%c", &tport,&trashinput); 				/*For the case of 1 computer with multiple processe*/
+    int len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
 	memset(&servaddr1,0,sizeof(servaddr1));
 	servaddr1.sin_family = AF_INET;
 	inet_aton(buffer, &servaddr1.sin_addr);
-	//servaddr1.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /*Default ip,For the case of 1 computer with multiple processe */
 	servaddr1.sin_port = htons(9000); //This is the port for all communication
-	//servaddr1.sin_port = htons(tport);		/*For the case of 1 computer with multiple processe*/
+
 
 	printf("\nPlease Enter 2nd IP. ::> ");
-	//printf("\nPlease Enter 2nd Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
 	fgets(buffer, sizeof(buffer), stdin);
-	len = strlen(buffer);
-	/* trim newline */
-	if (buffer[len-1] == '\n') {
-		 buffer[len-1] = 0;
-	}
-	//scanf("%d%c", &tport,&trashinput); 				/*For the case of 1 computer with multiple processe*/
+    len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
 	memset(&servaddr2,0,sizeof(servaddr2));
 	servaddr2.sin_family = AF_INET;
 	inet_aton(buffer, &servaddr2.sin_addr);
-	//servaddr2.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /*Default ip,For the case of 1 computer with multiple processe */
 	servaddr2.sin_port = htons(9000); //This is the port for all communication
-	//servaddr2.sin_port = htons(tport);		/*For the case of 1 computer with multiple processe*/
+
 
 	printf("\nPlease Enter 3rd IP. ::> ");
-	//printf("\nPlease Enter 3rd Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
 	fgets(buffer, sizeof(buffer), stdin);
-	len = strlen(buffer);
-	/* trim newline */
-	if (buffer[len-1] == '\n') {
-		buffer[len-1] = 0;
-	}
-	//scanf("%d%c", &tport,&trashinput); 				/*For the case of 1 computer with multiple processe*/
+    len = strlen(buffer);
+     /* trim newline */
+      if (buffer[len-1] == '\n') {
+            buffer[len-1] = 0;
+      }
 	memset(&servaddr3,0,sizeof(servaddr3));
 	servaddr3.sin_family = AF_INET;
 	inet_aton(buffer, &servaddr3.sin_addr);
-	//servaddr3.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /*Default ip,For the case of 1 computer with multiple processe */
 	servaddr3.sin_port = htons(9000); //This is the port for all communication
-	//servaddr3.sin_port = htons(tport);		/*For the case of 1 computer with multiple processe*/
+
 }
 void init(void) {
-   int i,n;
+    //int sockfd;
+    int i,n;
 	int sockoptval = 1;
 	char *temp;
     char trashinput;
-    getIP();
+	getIP();
     printf("What is my machine ID? ::>  ");
     scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
     /* set up UDP listening socket */
@@ -233,16 +221,11 @@ void init(void) {
         perror("socket");
         exit(1);
     }
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
+ 	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
     memset(&servaddr,0,sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr(myIP);
-    //servaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /*Default ip,For the case of 1 computer with multiple processe */
-    servaddr.sin_port = htons(9000); //This is the port for all communication
-    //printf("\nPlease Enter Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
-    //scanf("%d%c",&my_port,&trashinput); 
-    //servaddr.sin_port=htons(my_port);     /* let the operating system choose a port for us. For the case of 1 computer with multiple processes */
-    //fprintf(stderr, "My port number: %d\n", my_port);	/*For the case of 1 computer with multiple processe*/
+	servaddr.sin_port = htons(9000); //This is the port for all communication
     if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         perror("bind");
        exit(1);
