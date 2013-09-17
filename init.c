@@ -27,6 +27,7 @@ struct sockaddr_in servaddr1;
 struct sockaddr_in servaddr2;
 struct sockaddr_in servaddr3;
 int my_id;
+int flag;
 char myc_id;
 int sockfd;
 char myIP[NI_MAXHOST];
@@ -70,12 +71,12 @@ void *receive_thread_main(void *discard) {
                     FILE *file_ptr;                     // Get file pointer
                     int b_read;
                     file_ptr = fopen(lft, "a");         // Open file for appending in case this isn't the first write
-                    printf("Bytes sent: %d\n",buff.bytes_sent);         // debug
                     fwrite(buff.message, buff.bytes_sent, 1, file_ptr); // write the number of bytes sent in the message
                     fclose(file_ptr);                                   // close the filepointer
                 }
                 else if(strncmp(buf,"done",4) == 0){    // If done, set the relevant flag
                     status[buff.nid - 1] = 1;
+                    flag = 1;
                 }
                 else if(strncmp(buf,"grep",4) == 0){    // If the command recieved is grep
                     d_grep(buf,my_id);                  // Call the d_grep function
@@ -93,18 +94,14 @@ void *receive_thread_main(void *discard) {
                         int i = 0;
                         while(!feof(file_ptr))
                         {
-                            printf("Loop count: %d\n",i);
-                            if(i == 65){sleep(5);}
-                            i++;
                             b_read = fread(rbuff, 1, 1024, file_ptr);
+                            if(b_read < 1024){sleep(1);}
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
-                            printf("b_read value: %d\n",b_read);
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                         }
                         fclose(file_ptr);
                     }
-                    printf("Past file close! WTF?! \n");
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
                     sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
@@ -221,53 +218,67 @@ void init(void) {
 }
 void multicast(const char *message) {
 
-    int i;
+    int i,t;
     mess_s value;
     strcpy(value.command, message);
     if(strncmp(message,"grep",4)==0){
-    	for(i = 0; i<4; i++)
-    	{
+    	for(i = 0; i<4; i++){
     		status[i]=0;
     	}
-    }
-
-	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
-	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
-	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
-	sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
-    if(strncmp(message,"grep",4)==0){
-        // *** wait for results to get here
-        int t =0;
-        while(1)
-        {
-        	sleep(10);
-        	t+=10;
-            status[my_id-1] = 1; // Our own results should not fail.
-        	if (status[0] == 1 && status[1] == 1 && status[2] == 1 && status[3] == 1)
-        	{
-        		break;
-        	}
-        	else if(t  == 60)
-        	{
-        		if(status[0]==0)
-        		{
-        			printf("Machine 1 has failed.\n");
-        		}
-        		if(status[1]==0)
-        		{
-        			printf("Machine 2 has failed.\n");
-        		}
-        		if(status[2]==0)
-        		{
-        			printf("Machine 3 has failed.\n");
-        		}
-        		if(status[3]==0)
-        		{
-        			printf("Machine 4 has failed.\n");
-        		}
-        		break;
-        	}
+        
+        sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
+        t = 0;
+        while(1){
+            sleep(1);
+            t+=1;
+            if(flag == 1){
+                flag = 0;
+                break;
+            }else if(t == 10){
+                break;
+            }
         }
+        sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
+        t =0;
+        while(1){
+            sleep(1);
+            t+=1;
+            if(flag == 1){
+                flag = 0;
+                break;
+            }else if(t == 10){
+                break;
+            }
+        }
+        sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
+        t =0;
+        while(1){
+            sleep(1);
+            t+=1;
+            if(flag == 1){
+                flag = 0;
+                break;
+            }else if(t == 10){
+                break;
+            }
+        }
+        sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
+        t =0;
+        while(1){
+            sleep(1);
+            t+=1;
+            if(flag == 1){
+                flag = 0;
+                break;
+            }else if(t == 10){
+                break;
+            }
+        }
+
+        if(status[0]==0){printf("Machine 1 has failed.\n");}
+        if(status[1]==0){printf("Machine 2 has failed.\n");}
+        if(status[2]==0){printf("Machine 3 has failed.\n");}
+        if(status[3]==0){printf("Machine 4 has failed.\n");}
 
         // Combine the .tmp results files into grep.output and delete the .tmp files
         combine();
