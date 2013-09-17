@@ -27,7 +27,7 @@ struct sockaddr_in servaddr1;
 struct sockaddr_in servaddr2;
 struct sockaddr_in servaddr3;
 int my_id;
-int flag;
+int flag,t_flag;
 char myc_id;
 int sockfd;
 char myIP[NI_MAXHOST];
@@ -65,6 +65,7 @@ void *receive_thread_main(void *discard) {
                     gen_logs(my_id);                    // If so, generate logs based on our ID
                 }
                 else if(strncmp(buf,"reply",5) == 0){   // Otherwise check if this is a reply
+                    t_flag = 0;
                     char lft[11];                       // Set up a buffer for the file name we need to create
                     strcpy(lft, lf);                    // Copy base filename string into this buffer "resulti.tmp"
                     lft[6] = buff.id;                   // Set id number for file
@@ -221,7 +222,7 @@ void init(void) {
 }
 void multicast(const char *message) {
 
-    int i,t;
+    int i;
     mess_s value;
     strcpy(value.command, message);
     if(strncmp(message,"grep",4)==0){
@@ -230,50 +231,50 @@ void multicast(const char *message) {
     	}
         flag = 0;
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
-        t = 0;
+        t_flag = 0;
         while(1){
             sleep(1);
-            t+=1;
+            t_flag += 1;
             if(flag == 1){
                 flag = 0;
                 break;
-            }else if(t == 10){
+            }else if(t_flag == 10){
                 break;
             }
         }
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr1, sizeof(servaddr1));
-        t =0;
+        t_flag = 0;
         while(1){
             sleep(1);
-            t+=1;
+            t_flag += 1;
             if(flag == 1){
                 flag = 0;
                 break;
-            }else if(t == 10){
+            }else if(t_flag == 10){
                 break;
             }
         }
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr2, sizeof(servaddr2));
-        t =0;
+        t_flag = 0;
         while(1){
             sleep(1);
-            t+=1;
+            t_flag += 1;
             if(flag == 1){
                 flag = 0;
                 break;
-            }else if(t == 10){
+            }else if(t_flag == 10){
                 break;
             }
         }
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr3, sizeof(servaddr3));
-        t =0;
+        t_flag = 0;
         while(1){
             sleep(1);
-            t+=1;
+            t_flag += 1;
             if(flag == 1){
                 flag = 0;
                 break;
-            }else if(t == 10){
+            }else if(t_flag == 10){
                 break;
             }
         }
