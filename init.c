@@ -101,6 +101,7 @@ void *receive_thread_main(void *discard) {
                 	{
                 		strcpy(ret.message, rbuff);
                         ret.bytes_sent = b_read;
+                        printf("%d",b_read);
                 		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 	}
                 	fclose(file_ptr);
