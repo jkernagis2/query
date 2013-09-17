@@ -76,7 +76,7 @@ void *receive_thread_main(void *discard) {
                 lft[6] = buff.id;
                 FILE *file_ptr;
                 int b_read;
-                file_ptr = fopen(lft, "w");
+                file_ptr = fopen(lft, "a");
                 fwrite(buff.message, buff.bytes_sent, 1, file_ptr);
                 fclose(file_ptr);
 
