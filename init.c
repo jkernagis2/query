@@ -98,6 +98,7 @@ void *receive_thread_main(void *discard) {
                             b_read = fread(rbuff, 1, 1024, file_ptr);
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
+                            printf("b_read value: %d\n",b_read);
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                         }
                         fclose(file_ptr);
