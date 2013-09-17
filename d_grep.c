@@ -4,15 +4,17 @@
 
 void d_grep(char* command_buffer, int machine_num) {
 
-    int i,j;                      // Index vars
+    int i;                      // Index vars
     int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
     int search_str_size;          // Size of search string alone
     int sys_str_size;             // Size of search string alone
-    char* gawk_buffer;            // Buffer
+    //char* gawk_buffer;            // Buffer
+    char gawk_buffer[256];            // Buffer
     //char* system_buffer;          // Buffer
     char system_buffer[256];          // Buffer
 
     // Check for flags, hyphen would be after "grep "
+    memset(gawk_buffer,'\0',256);
     memset(system_buffer,'\0',256);
     if(command_buffer[5] == '-'){
         switch(command_buffer[6]){
@@ -33,15 +35,9 @@ void d_grep(char* command_buffer, int machine_num) {
         search_str_size = strlen(command_buffer) - 5; // Size of search expression without "grep -k " or "grep -v "
         i = 5;
     }
-    gawk_buffer = malloc(search_str_size * sizeof(char));
-    memset(gawk_buffer,'\0',search_str_size*sizeof(char));
+
     // Copy over the search expression
-    j = 0;
-    while(i != strlen(command_buffer)){
-        gawk_buffer[j] = command_buffer[i];
-        i++;
-        j++;
-    }
+    strcpy(gawk_buffer, (command_buffer + i) );
 
     // Generating console command string
     // 14 + search string size + 38 = Size of string output to system
