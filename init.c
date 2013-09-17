@@ -166,8 +166,8 @@ void init_others(void){
 	char buffer[NI_MAXHOST];
 	char *temp;
 	int i;
-	//int tport;					/*For the case of 1 computer with multiple processe*/
-	//char trashinput;				/*For the case of 1 computer with multiple processe*/
+	int tport;					/*For the case of 1 computer with multiple processe*/
+	char trashinput;				/*For the case of 1 computer with multiple processe*/
 	
 	
 	//printf("\nPlease Enter 1st IP. ::> ");
