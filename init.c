@@ -101,6 +101,9 @@ void *receive_thread_main(void *discard) {
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                         }
                         fclose(file_ptr);
+                        char remove_buff[14] = "rm resulti.tmp";
+                        remove_buff[9] = myc_id;
+                        system(remove_buff);
                     }
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
