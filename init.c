@@ -99,7 +99,7 @@ void *receive_thread_main(void *discard) {
                             if(b_read < 1024){sleep(1);}
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
-                            usleep(10);
+                            usleep(40);
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                             i++;
                         }
