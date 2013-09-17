@@ -239,9 +239,9 @@ void init(void) {
     servaddr.sin_addr.s_addr = inet_addr(myIP);
     servaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); /*Default ip,For the case of 1 computer with multiple processe */
     //servaddr.sin_port = htons(9000); //This is the port for all communication
-    servaddr.sin_port=htons(0);     /* let the operating system choose a port for us. For the case of 1 computer with multiple processes */
-    
-    my_port = ntohs(servaddr.sin_port);			/*For the case of 1 computer with multiple processe*/
+    printf("\nPlease Enter Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
+    scanf("%d%c",&my_port,&trashinput); 
+    servaddr.sin_port=htons(my_port);     /* let the operating system choose a port for us. For the case of 1 computer with multiple processes */
     fprintf(stderr, "My port number: %d\n", my_port);	/*For the case of 1 computer with multiple processe*/
     if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         perror("bind");
