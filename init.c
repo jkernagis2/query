@@ -112,8 +112,8 @@ void *receive_thread_main(void *discard) {
                         int i = 0;
                         while(!feof(file_ptr))
                         {
-                            b_read = fread(rbuff, 1, 1024, file_ptr);
-                            if(b_read < 1024){sleep(1);}
+                            b_read = fread(rbuff, 1, 50000, file_ptr);
+                            //if(b_read < 1024){sleep(1);}
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
                             usleep(50000);

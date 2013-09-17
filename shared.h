@@ -11,7 +11,7 @@ typedef struct {
 	char id;
 	int nid;
 	char command[20];
-	char message[1024];
+	char message[50000];
     int bytes_sent;
 } mess_s;
 
