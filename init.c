@@ -104,7 +104,7 @@ void *receive_thread_main(void *discard) {
                         fclose(file_ptr);
                         char remove_buff[14] = "rm resulti.tmp";
                         remove_buff[9] = myc_id;
-                        system(remove_buff);
+                        //system(remove_buff);
                     }
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
