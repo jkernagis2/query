@@ -64,7 +64,7 @@ void *receive_thread_main(void *discard) {
         }
         else {
 			temp = inet_ntoa(fromaddr.sin_addr); // return the IP
-        	printf("<%s> %s\n", temp,buf);
+        	printf("<%s> %s\n", temp,buf);       // Prints incoming message
             if(strncmp(buf,"/test",5) == 0){
 
                 gen_logs(my_id);
@@ -77,6 +77,7 @@ void *receive_thread_main(void *discard) {
                 FILE *file_ptr;
                 int b_read;
                 file_ptr = fopen(lft, "a");
+                printf("Bytes sent: %d\n",buff.bytes_sent);
                 fwrite(buff.message, buff.bytes_sent, 1, file_ptr);
                 fclose(file_ptr);
 
@@ -101,7 +102,7 @@ void *receive_thread_main(void *discard) {
                 	{
                 		strcpy(ret.message, rbuff);
                         ret.bytes_sent = b_read;
-                        printf("%d",b_read);
+                        
                 		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 	}
                 	fclose(file_ptr);
