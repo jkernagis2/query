@@ -228,7 +228,7 @@ void multicast(const char *message) {
     	for(i = 0; i<4; i++){
     		status[i]=0;
     	}
-        
+        flag = 0;
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
         t = 0;
         while(1){
