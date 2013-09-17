@@ -43,7 +43,6 @@ void *receive_thread_main(void *discard) {
 	char *temp;
     mess_s buff;
     char rbuff[1024];
-    int i;
     for (;;) {
         int source;
         len = sizeof(fromaddr);
@@ -55,8 +54,6 @@ void *receive_thread_main(void *discard) {
             perror("recvfrom");
             exit(1);
         }
-        int i;
-
         source = ntohs(fromaddr.sin_port);
 
         if(nbytes == 0){}
@@ -93,8 +90,10 @@ void *receive_thread_main(void *discard) {
                         file_ptr = fopen(lft, "r");
                         strcpy(ret.command, "reply");
                         ret.id = myc_id;
+                        int i = 0;
                         while(!feof(file_ptr))
                         {
+                            printf("Loop count: %d\n",i);
                             b_read = fread(rbuff, 1, 1024, file_ptr);
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
