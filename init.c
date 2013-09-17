@@ -49,7 +49,7 @@ void *receive_thread_main(void *discard) {
         len = sizeof(fromaddr);
         nbytes = recvfrom(sockfd,&buff,sizeof(mess_s),0,(struct sockaddr *)&fromaddr,&len);
         strcpy(buf, buff.command);
-        if (nbytes < 0) {
+        if (nbytes < 0){
             if (errno == EINTR)
                 continue;
             perror("recvfrom");
@@ -59,59 +59,54 @@ void *receive_thread_main(void *discard) {
 
         source = ntohs(fromaddr.sin_port);
 
-        if (nbytes == 0) {
-
-        }
-        else {
-			temp = inet_ntoa(fromaddr.sin_addr); // return the IP
-        	printf("<%s> %s\n", temp,buf);       // Prints incoming message
-            if(strncmp(buf,"/test",5) == 0){
-
-                gen_logs(my_id);
-
-            }
-            else if(strncmp(buf,"reply",5) == 0){
-            	char lft[11];
-            	strcpy(lft, lf);
-                lft[6] = buff.id;
-                FILE *file_ptr;
-                int b_read;
-                file_ptr = fopen(lft, "a");
-                printf("Bytes sent: %d\n",buff.bytes_sent);
-                fwrite(buff.message, buff.bytes_sent, 1, file_ptr);
-                fclose(file_ptr);
-
-            }
-            else if(strncmp(buf,"done",4) == 0){
-            	status[buff.nid - 1] = 1;
-            }
-            else if(strncmp(buf,"grep",4) == 0){
-                d_grep(buf,my_id);
-                mess_s ret;
-                if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr)
-                {
-                	char lft[11];
-            		strcpy(lft, lf);
-                	lft[6] = myc_id;
-                	FILE *file_ptr;
-                	int b_read;
-                	file_ptr = fopen(lft, "r");
-                	strcpy(ret.command, "reply");
-                	ret.id = myc_id;
-                	while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
-                	{
-                		strcpy(ret.message, rbuff);
-                        ret.bytes_sent = b_read;
-                        
-                		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
-                	}
-                	fclose(file_ptr);
+        if(nbytes == 0){}
+            else{
+                temp = inet_ntoa(fromaddr.sin_addr);    // return the IP
+                printf("<%s> %s\n", temp,buf);          // Prints incoming message
+                if(strncmp(buf,"/test",5) == 0){        // Check if we are doing a test
+                    gen_logs(my_id);                    // If so, generate logs based on our ID
                 }
-                ret.nid = my_id;
-                strcpy(ret.command, "done");
-                sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                else if(strncmp(buf,"reply",5) == 0){   // Otherwise check if this is a reply
+                    char lft[11];                       // Set up a buffer for the file name we need to create
+                    strcpy(lft, lf);                    // Copy base filename string into this buffer "resulti.tmp"
+                    lft[6] = buff.id;                   // Set id number for file
+                    FILE *file_ptr;                     // Get file pointer
+                    int b_read;
+                    file_ptr = fopen(lft, "a");         // Open file for appending in case this isn't the first write
+                    printf("Bytes sent: %d\n",buff.bytes_sent);         // debug
+                    fwrite(buff.message, buff.bytes_sent, 1, file_ptr); // write the number of bytes sent in the message
+                    fclose(file_ptr);                                   // close the filepointer
+                }
+                else if(strncmp(buf,"done",4) == 0){    // If done, set the relevant flag
+                    status[buff.nid - 1] = 1;
+                }
+                else if(strncmp(buf,"grep",4) == 0){    // If the command recieved is grep
+                    d_grep(buf,my_id);                  // Call the d_grep function
+                    mess_s ret;                         // make a mess_s struction
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr){
+                        char lft[11];
+                        strcpy(lft, lf);
+                        lft[6] = myc_id;
+                        FILE *file_ptr;
+                        int b_read;
+                        file_ptr = fopen(lft, "r");
+                        strcpy(ret.command, "reply");
+                        ret.id = myc_id;
+                        while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
+                        {
+                            strcpy(ret.message, rbuff);
+                            ret.bytes_sent = b_read;
+
+                            sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                        }
+                        fclose(file_ptr);
+                    }
+                    ret.nid = my_id;
+                    strcpy(ret.command, "done");
+                    sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                }
             }
-        }
     }
 }
 void getIP(void) {
