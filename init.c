@@ -242,7 +242,7 @@ void init(void) {
     //printf("\nPlease Enter Port ID. ::> ");	/*For the case of 1 computer with multiple processe*/
     //scanf("%d%c",&my_port,&trashinput); 
     //servaddr.sin_port=htons(my_port);     /* let the operating system choose a port for us. For the case of 1 computer with multiple processes */
-    fprintf(stderr, "My port number: %d\n", my_port);	/*For the case of 1 computer with multiple processe*/
+    //fprintf(stderr, "My port number: %d\n", my_port);	/*For the case of 1 computer with multiple processe*/
     if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         perror("bind");
        exit(1);
