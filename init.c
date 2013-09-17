@@ -102,6 +102,7 @@ void *receive_thread_main(void *discard) {
                         }
                         fclose(file_ptr);
                     }
+                    printf("Past file close! WTF?! \n");
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
                     sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
