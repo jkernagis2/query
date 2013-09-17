@@ -95,16 +95,18 @@ void *receive_thread_main(void *discard) {
                         int i = 0;
                         while(!feof(file_ptr))
                         {
+                            if(i == 30){sleep(1);}
                             b_read = fread(rbuff, 1, 1024, file_ptr);
                             if(b_read < 1024){sleep(1);}
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                            i++;
                         }
                         fclose(file_ptr);
                         char remove_buff[14] = "rm resulti.tmp";
                         remove_buff[9] = myc_id;
-                        //system(remove_buff);
+                        system(remove_buff);
                     }
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
