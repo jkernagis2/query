@@ -27,6 +27,10 @@ struct sockaddr_in servaddr1;
 struct sockaddr_in servaddr2;
 struct sockaddr_in servaddr3;
 int my_id;
+FILE* fp1;
+FILE* fp2;
+FILE* fp3;
+FILE* fp4;
 int flag,t_flag;
 char myc_id;
 int sockfd;
@@ -69,11 +73,24 @@ void *receive_thread_main(void *discard) {
                     char lft[11];                       // Set up a buffer for the file name we need to create
                     strcpy(lft, lf);                    // Copy base filename string into this buffer "resulti.tmp"
                     lft[6] = buff.id;                   // Set id number for file
-                    FILE *file_ptr;                     // Get file pointer
                     int b_read;
-                    file_ptr = fopen(lft, "a");         // Open file for appending in case this isn't the first write
-                    fwrite(buff.message, buff.bytes_sent, 1, file_ptr); // write the number of bytes sent in the message
-                    fclose(file_ptr);                                   // close the filepointer
+                    
+                    switch(buff.id){
+                        case '1':
+                            fwrite(buff.message, buff.bytes_sent, 1, fp1); // write the number of bytes sent in the message
+                            break;
+                        case '2':
+                            fwrite(buff.message, buff.bytes_sent, 1, fp2); // write the number of bytes sent in the message
+                            break;
+                        case '3':
+                            fwrite(buff.message, buff.bytes_sent, 1, fp3); // write the number of bytes sent in the message
+                            break;
+                        case '4':
+                            fwrite(buff.message, buff.bytes_sent, 1, fp4); // write the number of bytes sent in the message
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 else if(strncmp(buf,"done",4) == 0){    // If done, set the relevant flag
                     status[buff.nid - 1] = 1;
@@ -99,7 +116,8 @@ void *receive_thread_main(void *discard) {
                             if(b_read < 1024){sleep(1);}
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
-                            usleep(50000);
+                            //usleep(50000);
+                            if(i == 20){sleep(3);}
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                             i++;
                         }
@@ -232,6 +250,10 @@ void multicast(const char *message) {
     		status[i]=0;
     	}
         flag = 0;
+        fp1 = fopen("result1.tmp","w");
+        fp2 = fopen("result2.tmp","w");
+        fp3 = fopen("result3.tmp","w");
+        fp4 = fopen("result4.tmp","w");
         sendto(sockfd, &value, sizeof(mess_s), 0, (struct sockaddr *) &servaddr, sizeof(servaddr));
         t_flag = 0;
         while(1){
@@ -285,6 +307,10 @@ void multicast(const char *message) {
         if(status[1]==0){printf("Machine 2 has failed.\n");}
         if(status[2]==0){printf("Machine 3 has failed.\n");}
         if(status[3]==0){printf("Machine 4 has failed.\n");}
+        fclose(fp1);                                   // close the filepointer
+        fclose(fp2);                                   // close the filepointer
+        fclose(fp3);                                   // close the filepointer
+        fclose(fp4);                                   // close the filepointer
 
         // Combine the .tmp results files into grep.output and delete the .tmp files
         combine();
