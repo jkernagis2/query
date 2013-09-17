@@ -94,6 +94,7 @@ void *receive_thread_main(void *discard) {
                         while(!feof(file_ptr))
                         {
                             printf("Loop count: %d\n",i);
+                            if(i == 65){sleep(5);}
                             i++;
                             b_read = fread(rbuff, 1, 1024, file_ptr);
                             strcpy(ret.message, rbuff);
