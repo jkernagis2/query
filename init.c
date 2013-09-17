@@ -101,7 +101,7 @@ void *receive_thread_main(void *discard) {
                     d_grep(buf,my_id);                  // Call the d_grep function
                     mess_s ret;                         // make a mess_s struction
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
-                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr){
+                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr || fromaddr.sin_port != servaddr.sin_port){
                         char lft[11];
                         strcpy(lft, lf);
                         lft[6] = myc_id;
