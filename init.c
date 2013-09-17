@@ -93,11 +93,11 @@ void *receive_thread_main(void *discard) {
                         file_ptr = fopen(lft, "r");
                         strcpy(ret.command, "reply");
                         ret.id = myc_id;
-                        while((b_read = fread(rbuff, 1, 1024, file_ptr)) > 0)
+                        while(!feof(file_ptr))
                         {
+                            b_read = fread(rbuff, 1, 1024, file_ptr);
                             strcpy(ret.message, rbuff);
                             ret.bytes_sent = b_read;
-
                             sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                         }
                         fclose(file_ptr);
