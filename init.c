@@ -106,14 +106,10 @@ void *receive_thread_main(void *discard) {
                 		sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 	}
                 	fclose(file_ptr);
-                	ret.nid = my_id;
-                	strcpy(ret.command, "done");
-
-
                 }
+                ret.nid = my_id;
+                strcpy(ret.command, "done");
                 sendto(sockfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
-
-                // Send resulting file, result<MYID>.tmp to whoever sent us the grep
             }
         }
     }
