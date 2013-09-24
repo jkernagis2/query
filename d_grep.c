@@ -2,20 +2,28 @@
 #include <string.h>
 #include <stdio.h>
 
+/************************************************************************/
+/*                                                                      */
+/*  Name:     d_grep                                                    */
+/*  Inputs:   Buffer with a grep command.                               */
+/*            Machine ID                                                */
+/*  Output:   None                                                      */
+/*  Function: Calls the system's gawk function to search machine.i.log. */
+/*                                                                      */
+/************************************************************************/
+
 void d_grep(char* command_buffer, int machine_num) {
 
-    int i;                      // Index vars
-    int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
+    int i;                        // Index variable
+    int command_flag;             // 0 = Default grep, 1 = key grep, 2 = value grep
     int search_str_size;          // Size of search string alone
-    int sys_str_size;             // Size of search string alone
-    //char* gawk_buffer;            // Buffer
-    char gawk_buffer[256];            // Buffer
-    //char* system_buffer;          // Buffer
-    char system_buffer[256];          // Buffer
+    char gawk_buffer[256];        // Internal command buffers
+    char system_buffer[256];
 
-    // Check for flags, hyphen would be after "grep "
-    memset(gawk_buffer,'\0',256);
+    memset(gawk_buffer,'\0',256);   // Clear Buffers
     memset(system_buffer,'\0',256);
+    
+    // Check for flags, hyphen would be after "grep "
     if(command_buffer[5] == '-'){
         switch(command_buffer[6]){
             case 'k':
@@ -29,18 +37,17 @@ void d_grep(char* command_buffer, int machine_num) {
                 break;
         }
         search_str_size = strlen(command_buffer) - 8; // Size of search expression without "grep -k " or "grep -v "
-        i = 8; // Start of the expression to be grep-ed
-    }else{
+        i = 8; // Index of start of the expression to be grep-ed
+    }else{     // If there is no flag, then we just search the whole line
         command_flag = 0;
-        search_str_size = strlen(command_buffer) - 5; // Size of search expression without "grep -k " or "grep -v "
-        i = 5;
+        search_str_size = strlen(command_buffer) - 5; // Size of search expression without "grep "
+        i = 5; // Index of start of the expression to be grep-ed
     }
 
     // Copy over the search expression
     strcpy(gawk_buffer, (command_buffer + i) );
 
     // Generating console command string
-    // 14 + search string size + 38 = Size of string output to system
     sprintf(system_buffer,"%s%s%s%d%s%d%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.",machine_num,".log > result",machine_num,".tmp\n");
 
     // Setting whether we want to search the whole line/key/values
@@ -54,26 +61,39 @@ void d_grep(char* command_buffer, int machine_num) {
             system_buffer[11] = '2';
             break;
         default:
+            // This will never happen.
             break;
     }
-    printf(system_buffer);
 
-    // Make the system call to do gawk
+    // Make the system call to do gawk with the command string we just built
     system(system_buffer);
-    
-    // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
+
+    // Results of the gawk/grep are in resulti.tmp, ready to be sent out or whatever we need to do
     return;
 }
 
-// Combines the result1.tmp through results4.tmp if present into a single file, grep.output.
-//  Also deletes the temp files when done with them.
+
+/************************************************************************/
+/*                                                                      */
+/*  Name:     combine                                                   */
+/*  Inputs:   None.                                                     */
+/*  Output:   None.                                                     */
+/*  Function: Combines the result1.tmp through results4.tmp if present  */
+/*              into a single file. Also deletes the temp files when    */
+/*              done with them.                                         */
+/*                                                                      */
+/************************************************************************/
 void combine(){
+
+    // Open all file pointers
     FILE* fp1 = fopen("result1.tmp","r");
     FILE* fp2 = fopen("result2.tmp","r");
     FILE* fp3 = fopen("result3.tmp","r");
     FILE* fp4 = fopen("result4.tmp","r");
     FILE* fp5 = fopen("grep.output","w");
-
+    
+    // Used to store each char that we read from the file
+    // When it equals EOF, we've hit the end of the file
     int check = 0;
 
     if(fp1 != NULL){
