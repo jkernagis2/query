@@ -4,14 +4,18 @@
 
 void d_grep(char* command_buffer, int machine_num) {
 
-    int i,j;                      // Index vars
+    int i;                      // Index vars
     int command_flag;             // 0 = no flags so default grep, 1 = key grep, 2 = value grep
     int search_str_size;          // Size of search string alone
     int sys_str_size;             // Size of search string alone
-    char* gawk_buffer;            // Buffer
-    char* system_buffer;          // Buffer
+    //char* gawk_buffer;            // Buffer
+    char gawk_buffer[256];            // Buffer
+    //char* system_buffer;          // Buffer
+    char system_buffer[256];          // Buffer
 
     // Check for flags, hyphen would be after "grep "
+    memset(gawk_buffer,'\0',256);
+    memset(system_buffer,'\0',256);
     if(command_buffer[5] == '-'){
         switch(command_buffer[6]){
             case 'k':
@@ -31,20 +35,14 @@ void d_grep(char* command_buffer, int machine_num) {
         search_str_size = strlen(command_buffer) - 5; // Size of search expression without "grep -k " or "grep -v "
         i = 5;
     }
-    gawk_buffer = malloc(search_str_size * sizeof(char));
-    system_buffer = malloc((54 + search_str_size) * sizeof(char));
+
     // Copy over the search expression
-    j = 0;
-    while(command_buffer[i] != '\0'){
-        gawk_buffer[j] = command_buffer[i];
-        i++;
-        j++;
-    }
+    strcpy(gawk_buffer, (command_buffer + i) );
 
     // Generating console command string
     // 14 + search string size + 38 = Size of string output to system
     sprintf(system_buffer,"%s%s%s%d%s%d%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.",machine_num,".log > result",machine_num,".tmp\n");
-    printf(system_buffer);
+
     // Setting whether we want to search the whole line/key/values
     switch(command_flag){
         case(0):
@@ -58,10 +56,11 @@ void d_grep(char* command_buffer, int machine_num) {
         default:
             break;
     }
+    printf(system_buffer);
 
     // Make the system call to do gawk
     system(system_buffer);
-
+    
     // Results of the gawk/grep are in results.tmp, ready to be sent out or whatever we need to do
     return;
 }
@@ -75,7 +74,7 @@ void combine(){
     FILE* fp4 = fopen("result4.tmp","r");
     FILE* fp5 = fopen("grep.output","w");
 
-    int check;
+    int check = 0;
 
     if(fp1 != NULL){
         fprintf(fp5, "machine.1.log results:\n");
@@ -83,6 +82,8 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp1);
+    }else{
+        fprintf(fp5, "machine.1.log failure\n");
     }
 
     if(fp2 != NULL){
@@ -91,25 +92,32 @@ void combine(){
             fputc(check,fp5);
         }
         fclose(fp2);
+    }else{
+        fprintf(fp5, "machine.2.log failure\n");
     }
 
     if(fp3 != NULL){
-        fprintf(fp3, "machine.3.log results:\n");
+        fprintf(fp5, "machine.3.log results:\n");
         while((check = fgetc(fp3)) != EOF){
             fputc(check,fp5);
         }
         fclose(fp3);
+    }else{
+        fprintf(fp5, "machine.3.log failure\n");
     }
 
     if(fp4 != NULL){
-        fprintf(fp4, "machine.4.log results:\n");
+        fprintf(fp5, "machine.4.log results:\n");
         while((check = fgetc(fp4)) != EOF){
             fputc(check,fp5);
         }
         fclose(fp4);
+    }else{
+        fprintf(fp5, "machine.4.log failure\n");
     }
 
     fclose(fp5);
+    system("rm result1.tmp result2.tmp result3.tmp result4.tmp");
 }
 
 
