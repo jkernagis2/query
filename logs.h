@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void error_f(char *msg);
-void gen_logs(int machine_num);
-int verify_logs(int test_num);
+void log_join(int machine_num);
 
 #endif // LOGS_H

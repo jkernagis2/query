@@ -1,5 +1,5 @@
 #include "shared.h"
-#include "init.h"
+#include "network.h"
 #include "logs.h"
 #include "d_grep.h"
 #include <stdio.h>
@@ -17,35 +17,39 @@
 
 
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv){
 
-    init();
+    init(); // Calling out intialization function.
+            // This sets up the needed structures to store address information
 
-    while (1) {
-        char str[256];
-        int len;
+    // Main program loop
+    while(1){
+        char str[256];  // Input buffer
+        int len;        // Used to store strlen of the input buffer
 
-        if (fgets(str, sizeof(str), stdin) == NULL) {
-            if (feof(stdin)) {
+        // Get input from stdin to our input buffer
+        if(fgets(str, sizeof(str), stdin) == NULL){
+            if(feof(stdin)){
               break;
-            } else {
-                if (errno != EINTR) {
+            }else{
+                if(errno != EINTR){
                     perror("fgets");
                     break;
-                } else {
+                }else{
                     continue;
                 }
             }
         }
+        // Get length of input
         len = strlen(str);
-        /* trim newline */
-        if (str[len-1] == '\n') {
-            str[len-1] = 0;
-        }
-        if (strncmp(str, "/quit", 5) == 0) {
-            break;
-        }
+        
+        // Trim the newline char from the buffer
+        if(str[len-1] == '\n'){str[len-1] = '\0';}
+        
+        // Iff the command is to quit, break out of the program loop
+        if (strncmp(str, "/quit", 5) == 0) {break;}
 
+        // Otherwise, multicast the commmand to the other machines
         multicast(str);
     }
 
