@@ -104,7 +104,7 @@ void init(int type, char * servIP) {
     /*Setting Up Gossip List*/
     num_machines = 0;
     max_machines = 10;
-    gossip_list = malloc(10*sizeof(struct gossip_s));
+    gossip_list = malloc(10*sizeof(gossip_s));
 
     /*Add self to the gossip list*/
     getIP();
@@ -135,7 +135,7 @@ void init(int type, char * servIP) {
         fprintf(stderr, "Error in pthread_create\n");
         exit(1);
     }
-    if (pthread_create(&monitor_thread, NULL, &minitor_thread_main, NULL) != 0) {
+    if (pthread_create(&monitor_thread, NULL, &monitor_thread_main, NULL) != 0) {
         fprintf(stderr, "Error in pthread_create\n");
         exit(1);
     }
@@ -164,7 +164,7 @@ void multicast(const char *message) {
         //lock
         for(i =0; i<num_machines+1; i++)
         {
-            sendaddr.sin_addr.s_addr = gossip_list[i].addr;
+            sendaddr.sin_addr.s_addr = gossip_list[i].addr.s_addr;
             sendto(grepfd, &value, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
                     t_flag = 0;
             while(1){
@@ -194,33 +194,18 @@ void multicast(const char *message) {
         printf("Results recieved. Output located in grep.output.\n");
 
     }
-    else if(strncmp(message,"/test",5)==0){
-        // We sent the /test command to the others so they generated log files
-        // Now we need to do a few greps and verify that the results we get back are correct
-        int check = 0;
-        multicast("grep -k ^INFO");
-        check += verify_logs(1);
-        multicast("grep -k ^QUERY");
-        check += verify_logs(2);
-        multicast("grep -v D$");
-        check += verify_logs(3);
-        multicast("grep -v ^USER_3");
-        check += verify_logs(4);
-        if(check == 0){printf("Test success!\n");}
-        else{printf("Test failure.\n");}
-    }
 }
-void join(*gossip_s new_gossip){
+void join(gossip_s* new_gossip){
     //Lock
     num_machines += 1;
 
     /*Checks the size of list and makes it bigger if needed*/        
     if(num_machines == max_machines){
         max_machines *= 2;      
-        realloc(addr_list, max_machines*sizeof(in_addr));   //Doubles the size of the list
+        gossip_list = realloc(gossip_list, max_machines*sizeof(gossip_s));   //Doubles the size of the list
     }
     /*Added the new gossip to the list*/
-    memcopy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
+    memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
     gossip_list[num_machines].time = (int)time(NULL);
     //End Lock
     
@@ -233,7 +218,7 @@ void leave(int index, int type){
     }
     /*Erase the addrs in the list and shifts that array down*/
     //file IO saying someone left
-    memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index);
+    memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
     num_machines--;
 }
 
@@ -287,10 +272,7 @@ void *grep_recv_thread_main(void *discard) {
             else{
                 temp = inet_ntoa(fromaddr.sin_addr);    // return the IP
                 printf("<%s> %s\n", temp,buf);          // Prints incoming message
-                if(strncmp(buf,"/test",5) == 0){        // Check if we are doing a test
-                    gen_logs(my_id);                    // If so, generate logs based on our ID
-                }
-                else if(strncmp(buf,"reply",5) == 0){   // Otherwise check if this is a reply
+                if(strncmp(buf,"reply",5) == 0){   // Otherwise check if this is a reply
                     t_flag = 0;
                     char lft[11];                       // Set up a buffer for the file name we need to create
                     strcpy(lft, lf);                    // Copy base filename string into this buffer "resulti.tmp"
@@ -382,7 +364,7 @@ void *goss_recv_thread_main(void *discard) {
                     /*Updates List*/
                     if(rbuff.gossips[i].counter > gossip_list[j].counter)
                     {
-                        memcopy(&gossip_list[j], &rbuff.gossips[i],sizeof(gossip_s));
+                        memcpy(&gossip_list[j], &rbuff.gossips[i],sizeof(gossip_s));
                         gossip_list[j].time =(int)time(NULL);
                         continue;
                     }

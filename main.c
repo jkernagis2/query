@@ -19,7 +19,7 @@
 
 int main(int argc, char **argv){
 
-    init(); // Calling out intialization function.
+    init(atoi(argv[1]),argv[2]); // Calling out intialization function.
             // This sets up the needed structures to store address information
     
     system("rm ./backup/*");        // Remove any old log files.
@@ -59,7 +59,7 @@ int main(int argc, char **argv){
         else if(strncmp(str, "grep",4) == 0){
             multicast(str);
         }
-        else if(strncmp(str, "/leave",6){
+        else if(strncmp(str, "/leave",6)){
             
             
         }
