@@ -51,8 +51,8 @@ char lf[11] = "resulti.tmp";
 void init(int type, char * servIP) {
     //int grepfd;
     int i,n;
-	int sockoptval = 1;
-	char *temp;
+    int sockoptval = 1;
+    char *temp;
     char trashinput;
     srand(time(NULL));
     printf("What is my machine ID? ::>  ");
@@ -70,13 +70,13 @@ void init(int type, char * servIP) {
         perror("socket");
         exit(1);
     }
- 	setsockopt(grepfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
+     setsockopt(grepfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
     setsockopt(gossfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
     memset(&myaddr,0,sizeof(myaddr));
     memset(&myaddr,0,sizeof(mygaddr));
     myaddr.sin_family = AF_INET;
     myaddr.sin_addr.s_addr = inet_addr(myIP);
-	myaddr.sin_port = htons(9000); //This is the port for grep communication
+    myaddr.sin_port = htons(9000); //This is the port for grep communication
 
     if (bind(grepfd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
         perror("bind");
@@ -147,9 +147,9 @@ void multicast(const char *message) {
     struct sockaddr_in sendaddr;
     strcpy(value.command, message);
     if(strncmp(message,"grep",4)==0){
-    	for(i = 0; i<4; i++){
-    		status[i]=0;
-    	}
+        for(i = 0; i<4; i++){
+            status[i]=0;
+        }
         flag = 0;
         fp1 = fopen("result1.tmp","w");
         fp2 = fopen("result2.tmp","w");
@@ -207,19 +207,27 @@ void join(gossip_s* new_gossip){
     /*Added the new gossip to the list*/
     memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
     gossip_list[num_machines].time = (int)time(NULL);
+    //File IO saying someone joined
+    log_event(my_id,num_machines,"join",gossip_list);
+    
     //End Lock
     
 
-    //File IO saying someone joined
 }
 void leave(int index, int type){
-    if(type == 1){
-        //Crashed Machine
-    }
+
     /*Erase the addrs in the list and shifts that array down*/
-    //file IO saying someone left
     memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
     num_machines--;
+    
+    //file IO saying someone left
+    if(type == 1){
+        //Crashed Machine
+        log_event(my_id,num_machines,"crash",gossip_list);
+    }
+    else{
+        log_event(my_id,num_machines,"leave",gossip_list);
+    }
 }
 
 void getIP(void) {
@@ -379,6 +387,7 @@ void *goss_recv_thread_main(void *discard) {
 
             }
         }
+       
         //endlock
     }
 }

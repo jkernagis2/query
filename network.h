@@ -11,6 +11,7 @@
 
 #include "d_grep.h"
 #include "shared.h"
+#include <semaphore.h>
 #include <math.h>
 
 void *grep_recv_thread_main(void *discard);
