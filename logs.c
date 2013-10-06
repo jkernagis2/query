@@ -18,11 +18,11 @@ void log_event(int my_id, int num_machines, char* event, struct gossip_s* machin
     FILE* fp = fopen(buf,"a");
     
     fprintf(fp,event);
-    fputc(fp,':');
+    fputc(':',fp);
     for(i = 0;i < num_machines; i++){
         temp = inet_ntoa(machine.addr.sin_addr);
         fprintf(fp, "%s,%s,%d,%d,%d,%d;", (char*)machine[i].id, temp, (int)machine[i].counter,
                     (int)machine[i].time, (int)machine[i].p_crashed, (int)machine[i].has_left);
     }
-    fputc(fp,'\n');
+    fputc('\n',fp);
 }
