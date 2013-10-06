@@ -40,9 +40,14 @@ typedef struct{
 	struct in_addr addr; 	    //address
 	int32_t counter; 			//heartbeat counter
 	int32_t time;               //How should time be represented?/Do we even need time?
-    uint8_t id[50];             //
-    int32_t p_crashed;          //
-    int32_t has_left;           //
+	uint8_t id[50];             //
+	int32_t p_crashed;          //
+	int32_t has_left;           //
 } gossip_s
+
+typedef struct {
+	int32_t num_gossip;
+	gossip_s gossips[10];
+}gossip_m_s
 
 #endif
