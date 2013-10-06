@@ -445,7 +445,7 @@ void *gossip_thread_main(void *discard) {
             tnm--;
         }
         sem_post(gossip_lock);//end lock
-        //wait
+        usleep(200000);//wait
     }   
 }
 void *monitor_thread_main(void *discard) {
@@ -458,7 +458,7 @@ void *monitor_thread_main(void *discard) {
         {
             if(gossip_list[i].has_left == 1)
             {
-                if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
+                if((tempt-gossip_list[i].time) > 3/*NEED CHANGE*/)
                 {
                     leave(i, 0);
                 }
@@ -466,18 +466,18 @@ void *monitor_thread_main(void *discard) {
             }
             else if(gossip_list[i].p_crashed == 1)
             {
-                if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
+                if((tempt-gossip_list[i].time) > 4/*NEED CHANGE*/)
                 {
                     leave(i, 1);
                 }
                 continue;
             }
-            else if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
+            else if((tempt-gossip_list[i].time) > 2/*NEED CHANGE*/)
             {
                 gossip_list[i].p_crashed =1;
             }
         }
-        //wait
+        sleep(1);//wait
     }
 
     sem_post(gossip_lock);//end lock
