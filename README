@@ -23,9 +23,6 @@ Joins the group by sending a message to the master contact specified above.
 ---> /leave
 Cleanly leaves the group by sending a leave gossip to log2(N) machines.
 
----> /crash
-Leave the group without sending a leave gossip, forcing the group to find out for itself.
-
 ---> /quit
 Closes the program.  Does not cleanly leave the group beforehand.
 

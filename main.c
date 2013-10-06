@@ -21,7 +21,7 @@ int main(int argc, char **argv){
 
     init(); // Calling out intialization function.
             // This sets up the needed structures to store address information
-
+    
     system("rm ./backup/*");        // Remove any old log files.
     system("cp ./log/* ./backup/"); // Remove any old log files.
     system("rm ./log/*");           // Remove any old log files.
@@ -34,12 +34,14 @@ int main(int argc, char **argv){
         // Get input from stdin to our input buffer
         if(fgets(str, sizeof(str), stdin) == NULL){
             if(feof(stdin)){
-              break;
-            }else{
+                break;
+            }
+            else{
                 if(errno != EINTR){
                     perror("fgets");
                     break;
-                }else{
+                }
+                else{
                     continue;
                 }
             }
@@ -51,10 +53,16 @@ int main(int argc, char **argv){
         if(str[len-1] == '\n'){str[len-1] = '\0';}
 
         // Iff the command is to quit, break out of the program loop
-        if (strncmp(str, "/quit", 5) == 0) {break;}
-
-        // Otherwise, multicast the commmand to the other machines
-        multicast(str);
+        if (strncmp(str, "/quit", 5) == 0){
+            break;
+        }
+        else if(strncmp(str, "grep",4) == 0){
+            multicast(str);
+        }
+        else if(strncmp(str, "/leave",6){
+            
+            
+        }
     }
 
     return 0;
