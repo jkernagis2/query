@@ -43,11 +43,11 @@ typedef struct{
 	uint8_t id[50];             //
 	int32_t p_crashed;          //
 	int32_t has_left;           //
-} gossip_s
+} gossip_s;
 
 typedef struct {
 	int32_t num_gossip;
 	gossip_s gossips[10];
-}gossip_m_s
+}gossip_m_s;
 
 #endif

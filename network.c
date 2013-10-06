@@ -19,7 +19,7 @@
 struct sockaddr_in myaddr;
 struct sockaddr_in mygaddr;
 
-struct gossip_s* gossip_list;   //Needs to be initialized in init
+gossip_s* gossip_list;   //Needs to be initialized in init
 int num_machines;               //Needs to be initialized in init
 int max_machines;               //Needs to be initialized in init
 
@@ -322,7 +322,7 @@ void *grep_recv_thread_main(void *discard) {
                     d_grep(buf,my_id);                  // Call the d_grep function
                     mess_s ret;                         // make a mess_s struction
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
-                    if(fromaddr.sin_addr.s_addr != servaddr.sin_addr.s_addr){
+                    if(fromaddr.sin_addr.s_addr != gossip_list[0].addr.s_addr){
                         char lft[11];
                         strcpy(lft, lf);
                         lft[6] = myc_id;
@@ -354,7 +354,7 @@ void *grep_recv_thread_main(void *discard) {
     }
 }
 void *goss_recv_thread_main(void *discard) {
-    int i, j;
+    int i, j, nbytes;
     struct sockaddr_in fromaddr;
     socklen_t len;
     gossip_s rbuff[10];
@@ -377,12 +377,12 @@ void *goss_recv_thread_main(void *discard) {
         {
             for(j = 0; j<(num_machines +1); j++)
             {
-                if(rbuff.gossips[i].addr == gossip_list[j].addr)
+                if(rbuff.gossips[i].addr.s_addr == gossip_list[j].addr.s_addr)
                 {
                     /*Updates List*/
                     if(rbuff.gossips[i].counter > gossip_list[j].counter)
                     {
-                        memcopy(&gossip_list[j], &rbuff.gossips[i],sizeof(gossip_s))
+                        memcopy(&gossip_list[j], &rbuff.gossips[i],sizeof(gossip_s));
                         gossip_list[j].time =(int)time(NULL);
                         continue;
                     }
@@ -405,7 +405,7 @@ void *gossip_thread_main(void *discard) {
     int index;
     int * index_array;
     int * gossipees;
-    int num_gossip
+    int num_gossip;
     int  tnm;
     gossip_m_s sendg;
 
@@ -435,7 +435,7 @@ void *gossip_thread_main(void *discard) {
         for(i = 0; i< num_gossip; i++)
         {
             index = rand()%tnm;
-            sendaddr.sin_addr.s_addr = gossip_list[index_array[index]].addr;
+            sendaddr.sin_addr = gossip_list[index_array[index]].addr;
             for(j=0; j < num_machines; j += 10)
             {
                 for(k =0; k<(num_machines-j); k++)
@@ -452,17 +452,17 @@ void *gossip_thread_main(void *discard) {
         //wait
     }   
 }
-void *minitor_thread_main(void *discard) {
+void *monitor_thread_main(void *discard) {
     int i;
     int tempt = (int)time(NULL);
     //lock
     while(1)
     {
-        for(i = 1; i<=num_machines); i++)
+        for(i = 1; i<=num_machines; i++)
         {
             if(gossip_list[i].has_left == 1)
             {
-                if((tempt-gossip_list[i].time) > /**/)
+                if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
                 {
                     leave(i, 0);
                 }
@@ -470,13 +470,13 @@ void *minitor_thread_main(void *discard) {
             }
             else if(gossip_list[i].p_crashed == 1)
             {
-                if((tempt-gossip_list[i].time) > /**/)
+                if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
                 {
                     leave(i, 1);
                 }
                 continue;
             }
-            else if((tempt-gossip_list[i].time) > /**/)
+            else if((tempt-gossip_list[i].time) > 1/*NEED CHANGE*/)
             {
                 gossip_list[i].p_crashed =1;
             }
