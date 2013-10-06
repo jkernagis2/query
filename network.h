@@ -11,12 +11,18 @@
 
 #include "d_grep.h"
 #include "shared.h"
+#include "math.h"
 
-void *receive_thread_main(void *discard);
+void *grep_recv_thread_main(void *discard);
+void *goss_recv_thread_main(void *discard);
+void *gossip_thread_main(void *discard);
+void *monitor_thread_main(void *discard);
 
 void getIP(void);
 
-void init_others(void);
+void join(*gossip_s new_gossip);
+void leave(int index, int type);
+
 
 extern void init(void);
 
