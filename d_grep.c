@@ -53,7 +53,7 @@ void d_grep(char* command_buffer, int machine_num) {
     strcpy(gawk_buffer, (command_buffer + i) );
 
     // Generating console command string
-    sprintf(system_buffer,"%s%s%s%d%s%d%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' machine.",machine_num,".log > result",machine_num,".tmp\n");
+    sprintf(system_buffer,"%s%s%s%d%s%d%s","gawk -F: '$0~/",gawk_buffer,"/{print$0}' ./log/machine.",machine_num,".log > result",machine_num,".tmp\n");
 
     // Setting whether we want to search the whole line/key/values
     switch(command_flag){
