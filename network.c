@@ -31,6 +31,8 @@ char myc_id;
 
 char myIP[NI_MAXHOST];
 
+sem_t gossip_lock;
+
 FILE* fp1;
 FILE* fp2;
 FILE* fp3;
@@ -89,7 +91,10 @@ void init(int type, char * servIP) {
         exit(1);
     }
 
-
+    /* Initialize the semaphore */
+    sem_init(gossip_lock,0,1);
+    
+    
     /* start receiver thread to make sure we recieve grep call */
     if (pthread_create(&grep_recv_thread, NULL, &grep_recv_thread_main, NULL) != 0) {
         fprintf(stderr, "Error in pthread_create\n");
@@ -161,7 +166,7 @@ void multicast(const char *message) {
         sendaddr.sin_port = htons(9000); //This is the port for grep communication
 
 
-        //lock
+        sem_wait(gossip_lock);//lock
         for(i =0; i<num_machines+1; i++)
         {
             sendaddr.sin_addr.s_addr = gossip_list[i].addr.s_addr;
@@ -178,7 +183,7 @@ void multicast(const char *message) {
                 }
             }
         }
-        //end lock
+        sem_post(gossip_lock);//end lock
 
         if(status[0]==0){printf("Machine 1 has failed.\n");}
         if(status[1]==0){printf("Machine 2 has failed.\n");}
@@ -196,7 +201,7 @@ void multicast(const char *message) {
     }
 }
 void join(gossip_s* new_gossip){
-    //Lock
+    sem_wait(gossip_lock);//Lock
     num_machines += 1;
 
     /*Checks the size of list and makes it bigger if needed*/        
@@ -210,7 +215,7 @@ void join(gossip_s* new_gossip){
     //File IO saying someone joined
     log_event(my_id,num_machines,"join",gossip_list);
     
-    //End Lock
+    sem_post(gossip_lock);//End Lock
     
 
 }
@@ -361,7 +366,7 @@ void *goss_recv_thread_main(void *discard) {
             exit(1);
         }
 
-        //lock
+        sem_wait(gossip_lock);//lock
         /*Compare gossip to local gossip struct */
         for(i = 0; i<rbuff.num_gossip; i++)
         {
@@ -388,7 +393,7 @@ void *goss_recv_thread_main(void *discard) {
             }
         }
        
-        //endlock
+        sem_post(gossip_lock);//endlock
     }
 }
 void *gossip_thread_main(void *discard) {
@@ -408,7 +413,7 @@ void *gossip_thread_main(void *discard) {
 
     while(1)
     {
-        //lock
+        sem_wait(gossip_lock);//lock
         gossip_list[0].counter++;       //increase heartbeat
         tnm = num_machines;
         index_array = malloc(num_machines*sizeof(int)+1);
@@ -439,14 +444,14 @@ void *gossip_thread_main(void *discard) {
             memmove(&index_array[index], &index_array[index+1], sizeof(int)*(tnm-index));
             tnm--;
         }
-        //end lock
+        sem_post(gossip_lock);//end lock
         //wait
     }   
 }
 void *monitor_thread_main(void *discard) {
     int i;
     int tempt = (int)time(NULL);
-    //lock
+    sem_wait(gossip_lock);//lock
     while(1)
     {
         for(i = 1; i<=num_machines; i++)
@@ -475,5 +480,5 @@ void *monitor_thread_main(void *discard) {
         //wait
     }
 
-    //end lock
+    sem_post(gossip_lock);//end lock
 }
