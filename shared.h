@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
 //                              shared.h                                //
-//  Includes and declarations for the logs.c file.                      //
+//  Includes and declarations for the structures used in the project.   //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 

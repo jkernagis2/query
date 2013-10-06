@@ -8,6 +8,6 @@
 #include "logs.h"
 
 
-void log_join(int my_id, struct){
-
+void log_event(char* event, struct single_tracker_s machine){
+    
 }

@@ -10,27 +10,34 @@ Compilation Instructions
 ---> make
 
 2. Run the program on each computer.
----> ./distrib_grep
+---> ./release
 
 3. Upon running each instance of the program, you will be asked to enter
-    the addresses of the other machines, as well as the machine ID of the
-    current instance.  Please give each machine a unique ID from 1 to 4.
+    the address of the other master machine, as well as the machine ID of the
+    current instance.  Please give each machine a unique integer ID.
 
-4. You can run a unit test by entering the "/test" command from any machine.
+4. Basic commands:
+---> /join
+Joins the group by sending a message to the master contact specified above.
 
-    This will send a command to the other machines to generate logs based on
-    their machine ID.  The current machine will then send grep requests to the
-    other machines.  When the results are received, the current machine compares
-    the results to an internally defined answer file and reports success or failure.
+---> /leave
+Cleanly leaves the group by sending a leave gossip to log2(N) machines.
 
-5. Otherwise, you can use the grep command to perform a distributed search of log
-    files stored on all the machines.  Log files should be named based on machine ID:
-        machine.1.log
-        machine.2.log
-        machine.3.log
-        machine.4.log
+---> /crash
+Leave the group without sending a leave gossip, forcing the group to find out for itself.
 
-    See COMMAND USAGE below for an explanation of the available flags.
+---> /quit
+Closes the program.  Does not cleanly leave the group beforehand.
+
+---> grep
+You can use the grep command to perform a distributed search of log
+  files stored on all the machines.  Log files will be named based on machine ID:
+    machine.1.log
+    machine.2.log
+    machine.3.log
+    machine.4.log
+
+See COMMAND USAGE below for an explanation of the available flags for our grep.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 COMMAND USAGE

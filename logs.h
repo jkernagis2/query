@@ -12,6 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void log_join(int machine_num);
+void log_event(char* event, struct single_tracker_s machine);
 
 #endif // LOGS_H

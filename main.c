@@ -22,6 +22,10 @@ int main(int argc, char **argv){
     init(); // Calling out intialization function.
             // This sets up the needed structures to store address information
 
+    system("rm ./backup/*");        // Remove any old log files.
+    system("cp ./log/* ./backup/"); // Remove any old log files.
+    system("rm ./log/*");           // Remove any old log files.
+
     // Main program loop
     while(1){
         char str[256];  // Input buffer
@@ -42,10 +46,10 @@ int main(int argc, char **argv){
         }
         // Get length of input
         len = strlen(str);
-        
+
         // Trim the newline char from the buffer
         if(str[len-1] == '\n'){str[len-1] = '\0';}
-        
+
         // Iff the command is to quit, break out of the program loop
         if (strncmp(str, "/quit", 5) == 0) {break;}
 
