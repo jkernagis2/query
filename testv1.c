@@ -19,8 +19,8 @@
 
 int main(int argc, char **argv) {
 
-    init();
-
+    //init();
+    init(atoi(argv[1]),argv[2]); 
     while (1) {
         char str[256];
         int len;

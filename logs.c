@@ -140,3 +140,27 @@ int verify_logs(int test_num){
     return retval;
 
 }
+
+void log_event(int my_id, int num_machines, char* event, gossip_s* machine){
+    char buf[50];
+    int i;
+    char* temp;
+    memset(buf,'\0',sizeof(char)*50);
+    sprintf(buf, "%s%d%s", "machine.",my_id,".log");
+    FILE* fp = fopen(buf,"a");
+    if(fp == NULL)
+    {
+      printf("NULL\n");
+    }
+ 
+    fprintf(fp,"%s",event); 
+    fputc('\n',fp);
+    for(i = 0;i <=num_machines; i++){
+        temp = inet_ntoa(machine[i].addr);
+        fprintf(fp, "%s,%s,%d,%d,%d,%d;\n", (char*)(machine[i].id), temp, (int)(machine[i].counter),
+                    (int)(machine[i].time), (int)(machine[i].p_crashed), (int)(machine[i].has_left));
+    }
+    fputc('\n',fp); 
+    fclose(fp);
+}
+
