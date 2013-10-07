@@ -379,7 +379,7 @@ void leave(int index, int type){
     //file IO saying someone left
     if(type == 1){
         //Crashed Machine
-        if(index != 1){
+        if((index != 1) || (server_flag == 1)){
             /*Erase the addrs in the list and shifts that array down*/
             memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
             num_machines--;
@@ -441,18 +441,23 @@ void *goss_recv_thread_main(void *discard) {
                 for(j = 0; j<(num_machines+1); j++)
                 {
 
-                    //if(buff.gossips[i].addr.s_addr == gossip_list[j].addr.s_addr){
-                    if(strncmp(buff.gossips[i].id,gossip_list[j].id,50) == 0)
-                    {
-                        /*Updates List*/
-                        if(buff.gossips[i].counter > gossip_list[j].counter)
-                        { 
-                            gossip_list[j].counter = buff.gossips[i].counter;
-                            gossip_list[j].p_crashed = buff.gossips[i].p_crashed;
-                            gossip_list[j].has_left = buff.gossips[i].has_left;
-                            gossip_list[j].time =(int32_t)time(NULL);
-                            strncpy(gossip_list[j].id, buff.gossips[i].id, 50);
+                    if(buff.gossips[i].addr.s_addr != gossip_list[0].addr.s_addr){
+                        if(strncmp(buff.gossips[i].id,gossip_list[j].id,50) == 0)
+                        {
+                            /*Updates List*/
+                            if(buff.gossips[i].counter > gossip_list[j].counter)
+                            { 
+                                gossip_list[j].counter = buff.gossips[i].counter;
+                                gossip_list[j].p_crashed = buff.gossips[i].p_crashed;
+                                gossip_list[j].has_left = buff.gossips[i].has_left;
+                                gossip_list[j].time =(int32_t)time(NULL);
+                                strncpy(gossip_list[j].id, buff.gossips[i].id, 50);
+                            }
+                            break;
                         }
+                    }
+                    else
+                    {
                         break;
                     }
                  }
