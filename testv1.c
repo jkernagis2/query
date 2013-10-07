@@ -44,6 +44,10 @@ int main(int argc, char **argv) {
         }
         if (strncmp(str, "/quit", 5) == 0) {
             break;
+        }else if(strncmp(str, "/leave",6) == 0){
+        	set_leave();
+        }else if(strncmp(str, "/rejoin",7) == 0){
+        	rejoin();
         }
 
         multicast(str);

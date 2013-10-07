@@ -27,6 +27,8 @@ gossip_s* gossip_list; //Needs to be initialized in init
 int num_machines; //Needs to be initialized in init
 int max_machines; //Needs to be initialized in init
 
+volatile int leaving_group_flag = 0;
+
 sem_t gossip_lock;
 int grepfd;
 int gossfd;
@@ -39,7 +41,7 @@ FILE* fp4;
 int flag,t_flag;
 char myc_id;
 char myIP[NI_MAXHOST];
-
+int server_flag;
 
 
 pthread_t grep_recv_thread;
@@ -175,6 +177,7 @@ void init(int type, char * servIP) {
     int sockoptval = 1;
     char *temp;
     char trashinput;
+    server_flag = type;
     getIP();
     printf("What is my machine ID? ::>  ");
     scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
@@ -335,39 +338,69 @@ void multicast(const char *message) {
 }
 
 void join(gossip_s* new_gossip){
-    num_machines ++;
-
-    /*Checks the size of list and makes it bigger if needed*/
-    if(num_machines == max_machines){
-        max_machines *= 2;
-        gossip_list = realloc(gossip_list, max_machines*sizeof(gossip_s)); //Doubles the size of the list
+    if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr )
+    {
+        gossip_list[1].addr = new_gossip->addr;
+        gossip_list[1].counter = new_gossip->counter;
+        gossip_list[1].p_crashed = new_gossip->p_crashed;
+        gossip_list[1].has_left = new_gossip->has_left;
+        strncpy(gossip_list[1].id, new_gossip->id, 50);
+       gossip_list[1].time =(int)time(NULL);
+       //File IO saying someone joined
+       log_event(my_id,num_machines,"join",gossip_list);
     }
-    /*Added the new gossip to the list*/
-    //memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
-    gossip_list[num_machines].addr = new_gossip->addr;
-    gossip_list[num_machines].counter = new_gossip->counter;
-    gossip_list[num_machines].p_crashed = new_gossip->p_crashed;
-    gossip_list[num_machines].has_left = new_gossip->has_left;
-    strncpy(gossip_list[num_machines].id, new_gossip->id, 50);
-    gossip_list[num_machines].time =(int)time(NULL);
-    //File IO saying someone joined
-    log_event(my_id,num_machines,"join",gossip_list);
+    else
+    {
+        num_machines ++;
+
+        /*Checks the size of list and makes it bigger if needed*/
+        if(num_machines == max_machines){
+            max_machines *= 2;
+            gossip_list = realloc(gossip_list, max_machines*sizeof(gossip_s)); //Doubles the size of the list
+        }
+        /*Added the new gossip to the list*/
+        //memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
+        gossip_list[num_machines].addr = new_gossip->addr;
+        gossip_list[num_machines].counter = new_gossip->counter;
+        gossip_list[num_machines].p_crashed = new_gossip->p_crashed;
+        gossip_list[num_machines].has_left = new_gossip->has_left;
+        strncpy(gossip_list[num_machines].id, new_gossip->id, 50);
+       gossip_list[num_machines].time =(int)time(NULL);
+       //File IO saying someone joined
+       log_event(my_id,num_machines,"join",gossip_list);
+    }
 }
 
 
 void leave(int index, int type){
 
-    /*Erase the addrs in the list and shifts that array down*/
-    memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
-    num_machines--;
+
     
     //file IO saying someone left
     if(type == 1){
         //Crashed Machine
-        log_event(my_id,num_machines,"crash",gossip_list);
+        if(index != 1){
+            /*Erase the addrs in the list and shifts that array down*/
+            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
+            num_machines--;
+            log_event(my_id,num_machines,"crash",gossip_list);
+        }
+        else{
+            gossip_list[1].p_crashed = 2;
+            log_event(my_id,num_machines,"hostcrash",gossip_list);
+        }
     }
     else{
-        log_event(my_id,num_machines,"leave",gossip_list);
+    	if((index != 1) || (server_flag == 1)){
+            /*Erase the addrs in the list and shifts that array down*/
+            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
+            num_machines--;
+            log_event(my_id,num_machines,"leave",gossip_list);
+        }
+        else{
+            gossip_list[1].p_crashed = 2;
+            log_event(my_id,num_machines,"hostleave",gossip_list);
+        }
     }
 }
 
@@ -408,16 +441,16 @@ void *goss_recv_thread_main(void *discard) {
                 for(j = 0; j<(num_machines+1); j++)
                 {
 
-                    if(buff.gossips[i].addr.s_addr == gossip_list[j].addr.s_addr)
+                    //if(buff.gossips[i].addr.s_addr == gossip_list[j].addr.s_addr){
+                    if(strncmp(buff.gossips[i].id,gossip_list[j].id,50) == 0)
                     {
-                    	
                         /*Updates List*/
                         if(buff.gossips[i].counter > gossip_list[j].counter)
                         { 
                             gossip_list[j].counter = buff.gossips[i].counter;
                             gossip_list[j].p_crashed = buff.gossips[i].p_crashed;
                             gossip_list[j].has_left = buff.gossips[i].has_left;
-                            gossip_list[j].time =(int)time(NULL);
+                            gossip_list[j].time =(int32_t)time(NULL);
                             strncpy(gossip_list[j].id, buff.gossips[i].id, 50);
                         }
                         break;
@@ -427,7 +460,6 @@ void *goss_recv_thread_main(void *discard) {
                  {
                      if(buff.gossips[i].has_left == 0 && buff.gossips[i].p_crashed == 0)
                      {
-                         temp2 = inet_ntoa(buff.gossips[i].addr);
                          join(&buff.gossips[i]); //adds the new gossip if its not there.
                      }
                 }
@@ -455,6 +487,26 @@ void *gossip_thread_main(void *discard) {
     for(;;)
     {
         sem_wait(&gossip_lock);//lock
+        
+    	if(leaving_group_flag == 1)
+    	{
+    		leaving_group_flag++;
+    		gossip_list[0].has_left = 1;
+    	}
+    	else if(leaving_group_flag == 2)
+    	{
+	    if(server_flag)
+	    {
+		num_machines = 0;
+	    }
+	    else
+	    {
+		num_machines = 1;
+	    }
+            sem_post(&gossip_lock);//end lock
+    	    continue;
+    	}
+    	
         gossip_list[0].counter++; //increase heartbeat
         tnm = num_machines;
         index_array = malloc(num_machines*sizeof(int));
@@ -489,33 +541,40 @@ void *gossip_thread_main(void *discard) {
 }
 void *monitor_thread_main(void *discard) {
     int i;
-    int tempt = (int)time(NULL);
+    int tempt;
 
     while(1)
     {
+    	if(leaving_group_flag != 0){continue;}
         sem_wait(&gossip_lock);//lock
+        tempt = (int)time(NULL);
         for(i = 1; i<=num_machines; i++)
         {
+            printf("Checking\n");
+            if((i == 1) && (gossip_list[1].p_crashed == 2)){continue;}
             if(gossip_list[i].has_left == 1)
             {
-                if((tempt-gossip_list[i].time) > 3/*NEED CHANGE*/)
+                if((int)(tempt-gossip_list[i].time) > 3/*NEED CHANGE*/)
                 {
                     leave(i, 0);
                 }
                 continue;
             }
-            else if(gossip_list[i].p_crashed == 1)
+            else if(gossip_list[i].p_crashed == 1) 
             {
-                if((tempt-gossip_list[i].time) > 4/*NEED CHANGE*/)
+                printf("Starting to Crash\n");
+                if((int)(tempt-gossip_list[i].time) > 4/*NEED CHANGE*/) 
                 {
+                    printf("Crashing\n");
                     leave(i, 1);
                 }
                 continue;
             }
-            else if((tempt-gossip_list[i].time) > 2/*NEED CHANGE*/)
+            else if((int)(tempt-gossip_list[i].time) > 2/*NEED CHANGE*/)
             {
                 gossip_list[i].p_crashed =1;
             }
+            printf("Time diff = %d   i = %d\n",(int)(tempt-gossip_list[i].time), i);
         }
         sem_post(&gossip_lock);//end lock
         sleep(1);//wait
@@ -524,9 +583,22 @@ void *monitor_thread_main(void *discard) {
 
 }
 
+void set_leave(){
+	leaving_group_flag = 1;
+	// Clear local membership list from [2] to [END]
+	// IF(WE ARE SERVER){ clear membership list[1];}
+	
+	return;
+}
 
-
-
-
-
+void rejoin(){
+	// Generate new ID and stuff
+	    gossip_list[0].counter = 0;
+	    gossip_list[0].time = (int)time(NULL);
+	    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
+	    gossip_list[0].p_crashed = 0;
+	    gossip_list[0].has_left = 0;
+	    leaving_group_flag = 0;
+	return;
+}
 
