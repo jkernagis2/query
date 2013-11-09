@@ -150,55 +150,11 @@ void insert(int key, char* val){
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;  
 }
 
-void lookup(int key){
-    struct sockaddr_in sendaddr;
-    memset(&sendaddr, '\0', sizeof(sendaddr));
-    sendaddr.sin_family = AF_INET;
-    sendaddr.sin_port = htons(9090);
-    sendaddr.sin_addr = get_addr(key);
-    
+void lookup(int key){}
 
-    mess_s message;
-    memset(&message,'\0',sizeof(message));
-    message.nid = key;
-    strncpy(message.command,"lookup",6);
-    
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
-}
+void update(int key, char* new_val){}
 
-void update(int key, char* new_val){
-    struct sockaddr_in sendaddr;
-    memset(&sendaddr, '\0', sizeof(sendaddr));
-    sendaddr.sin_family = AF_INET;
-    sendaddr.sin_port = htons(9090);
-    sendaddr.sin_addr = get_addr(key);
-    
-
-    mess_s message;
-    memset(&message,'\0',sizeof(message));
-    message.nid = key;
-    strncpy(message.command,"update",6);
-    strncpy(message.message,val,strlen(val));
-    
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
-}
-
-void delete_k(int key){
-
-    struct sockaddr_in sendaddr;
-    memset(&sendaddr, '\0', sizeof(sendaddr));
-    sendaddr.sin_family = AF_INET;
-    sendaddr.sin_port = htons(9090);
-    sendaddr.sin_addr = get_addr(key);
-    
-
-    mess_s message;
-    memset(&message,'\0',sizeof(message));
-    message.nid = key;
-    strncpy(message.command,"delete",6);
-
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
-}
+void delete_k(int key){}
 
 struct in_addr get_addr(int key)
 {

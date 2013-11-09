@@ -149,15 +149,6 @@ void *grep_recv_thread_main(void *discard) {
                 else if(strncmp(buf,"insert",6) == 0){
                     local_insert(buff.nid, buff.message);
                 }
-                else if(strncmp(buf,"lookup",6) == 0){
-                    local_lookup(buff.nid);
-                }
-                else if(strncmp(buf,"update",6) == 0){
-                    local_update(buff.nid, buff.message);
-                }
-                else if(strncmp(buf,"delete",6) == 0){
-                    local_delete(buff.nid);
-                }
             }
     }
 }
