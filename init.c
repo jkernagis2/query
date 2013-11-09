@@ -153,7 +153,7 @@ void *grep_recv_thread_main(void *discard) {
                     mess_s ret;
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
                     ret.nid = buff.nid;
-                    strcpy(ret.command, "lookup_r");
+                    strcpy(ret.command, "r_lookup");
                     strcpy(ret.message,local_lookup(buff.nid));
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
@@ -163,7 +163,7 @@ void *grep_recv_thread_main(void *discard) {
                 else if(strncmp(buf,"delete",6) == 0){
                     local_delete(buff.nid);
                 }
-                else if(strncmp(buf,"lookup_r",8) == 0){
+                else if(strncmp(buf,"r_lookup",8) == 0){
                    printf("Key %d has value: %s\n",buff.nid,buff.message);
                 }
             }
