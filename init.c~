@@ -357,7 +357,6 @@ void multicast(const char *message) {
 }
 
 void join(gossip_s* new_gossip){
-    printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
     if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr)
     {
@@ -452,7 +451,7 @@ void *goss_recv_thread_main(void *discard) {
         if(nbytes == 0){}
         else{
             temp = inet_ntoa(fromaddr.sin_addr);    // return the IP
-            //printf("<%s>:Sent Gossip\n", temp);         // Prints incoming message
+            printf("<%s>:Sent Gossip\n", temp);         // Prints incoming message
 
             sem_wait(&gossip_lock);//lock
             /*Compare gossip to local gossip struct */
