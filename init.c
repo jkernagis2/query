@@ -324,7 +324,9 @@ void leave(int index, int type){
 }
 
 void set_leave(){
+    sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
+    sem_post(&gossip_lock);//endlock
 	// Clear local membership list from [2] to [END]
 	// IF(WE ARE SERVER){ clear membership list[1];}
 
