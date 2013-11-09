@@ -101,6 +101,9 @@ void local_delete(int key)
             if(current->next != NULL){
                 current->next->prev = current->prev;
             }
+            if(mykv == current){
+                mykv = current->next;
+            }
             free(current->value);
             free(current);
             return;
