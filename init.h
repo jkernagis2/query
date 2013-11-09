@@ -32,11 +32,16 @@ ring_n* myring;
 keyval* mykv;
 
 void init(int type, char * servIP);
-void getIP(void);
+void getIP();
 
 void multicast(const char *message);
+
 void join(gossip_s* new_gossip);
 void leave(int index, int type);
+
+void set_leave();
+void rejoin();
+
 void add_to_ring(int newid, struct in_addr new_addr);
 
 void *grep_recv_thread_main(void *discard);

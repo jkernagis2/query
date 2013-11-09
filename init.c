@@ -54,7 +54,328 @@ pthread_t monitor_thread;
 // Static file name array used in MP1
 char lf[11] = "resulti.tmp";
 
-void *grep_recv_thread_main(void *discard) {
+void init(int type, char * servIP){
+    int i,n;
+    int sockoptval = 1;
+    char *temp;
+    char trashinput;
+    server_flag = type;
+    getIP();
+    printf("What is my machine ID? ::>  ");
+    scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
+    /* set up UDP listening socket */
+    myc_id = (char)(((int)'0')+my_id);
+    grepfd = socket(AF_INET,SOCK_DGRAM,0);
+    gossfd = socket(AF_INET,SOCK_DGRAM,0);
+
+    if (grepfd < 0) {
+        perror("socket");
+        exit(1);
+    }
+    if (gossfd < 0) {
+        perror("socket");
+        exit(1);
+    }
+    setsockopt(grepfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
+    setsockopt(gossfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
+
+    memset(&myaddr,0,sizeof(myaddr));
+    memset(&mygaddr,0,sizeof(mygaddr));
+    myaddr.sin_family = AF_INET;
+    mygaddr.sin_family = AF_INET;
+    myaddr.sin_addr.s_addr = inet_addr(myIP);
+    mygaddr.sin_addr.s_addr = inet_addr(myIP);
+    myaddr.sin_port = htons(9090);
+    mygaddr.sin_port = htons(9091);
+
+    if (bind(grepfd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
+        perror("bind");
+       exit(1);
+    }
+    if (bind(gossfd, (struct sockaddr *)&mygaddr, sizeof(mygaddr)) < 0) {
+        perror("bind");
+        exit(1);
+    }
+
+    /* Initialize the semaphore */
+    sem_init(&gossip_lock,0,1);
+
+    /*Setting Up Gossip List*/
+    num_machines = 0;
+    max_machines = 10;
+    gossip_list = malloc(10*sizeof(gossip_s));
+
+    /*Add self to the gossip list*/
+    gossip_list[0].addr.s_addr = myaddr.sin_addr.s_addr;
+    gossip_list[0].counter = 0;
+    gossip_list[0].time = (int)time(NULL);
+    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
+    gossip_list[0].p_crashed = 0;
+    gossip_list[0].has_left = 0;
+    gossip_list[0].has_left = 0;
+    /*MP3*/
+    gossip_list[0].ring_id= my_id;
+    if(type == 0)
+    {
+        gossip_list[1].addr.s_addr = inet_addr(servIP);
+        gossip_list[1].counter = 0;
+        gossip_list[1].time = (int)time(NULL);
+        sprintf(gossip_list[1].id,"%d-%d",my_id,(int)time(NULL));
+        gossip_list[1].p_crashed = 0;
+        gossip_list[1].has_left = 0;
+        num_machines = 1;
+    }
+    else{
+        printf("My IP: %s\n", myIP);
+    }
+
+    if (pthread_create(&grep_recv_thread, NULL, &grep_recv_thread_main, NULL) != 0) {
+        fprintf(stderr, "Error in pthread_create\n");
+        exit(1);
+    }
+    if (pthread_create(&goss_recv_thread, NULL, &goss_recv_thread_main, NULL) != 0) {
+        fprintf(stderr, "Error in pthread_create\n");
+        exit(1);
+    }
+    /*Starting Gossip thread*/
+    if (pthread_create(&gossip_thread, NULL, &gossip_thread_main, NULL) != 0) {
+        fprintf(stderr, "Error in pthread_create\n");
+        exit(1);
+    }
+    if (pthread_create(&monitor_thread, NULL, &monitor_thread_main, NULL) != 0) {
+        fprintf(stderr, "Error in pthread_create\n");
+        exit(1);
+    }
+
+    /*Ring Initialization*/
+    myring = malloc(sizeof(ring_n));
+    myring->value = my_id;
+    myring->next = NULL;
+    myring->prev = NULL;
+    myring->addr.s_addr = myaddr.sin_addr.s_addr;
+
+
+}
+void getIP(){
+	struct ifaddrs *ifaddr, *ifa;
+	int family, s;
+
+
+	if (getifaddrs(&ifaddr) == -1) {
+		perror("getifaddrs");
+		exit(EXIT_FAILURE);
+	}
+
+	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+		family = ifa->ifa_addr->sa_family;
+
+		if (family == AF_INET) {
+			s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), myIP, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+			if (s != 0) {
+					printf("getnameinfo() failed: %s\n", gai_strerror(s));
+					exit(EXIT_FAILURE);
+			}
+			if(strncmp(ifa->ifa_name, "eth0", 4) == 0){
+				printf("My IP: %s\n", myIP); //remove
+			}
+		}
+	}
+}
+
+void multicast(const char *message){
+
+    int i;
+    mess_s value;
+    strcpy(value.command, message);
+    struct sockaddr_in sendaddr;
+    if(strncmp(message,"grep",4)==0){
+    	for(i = 0; i<4; i++){
+    		status[i]=0;
+    	}
+        flag = 0;
+        fp1 = fopen("result1.tmp","w");
+        fp2 = fopen("result2.tmp","w");
+        fp3 = fopen("result3.tmp","w");
+        fp4 = fopen("result4.tmp","w");
+
+
+        memset(&sendaddr, 0, sizeof(sendaddr));
+        sendaddr.sin_family = AF_INET;
+        sendaddr.sin_port = htons(9090); //This is the port for grep communication
+
+        //sem_wait(&gossip_lock);//lock
+        for(i =0; i<=num_machines; i++)
+        {
+            sendaddr.sin_addr.s_addr = gossip_list[i].addr.s_addr;
+            sendto(grepfd, &value, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
+            t_flag = 0;
+            while(1){
+                sleep(1);
+                t_flag += 1;
+                if(flag == 1){
+                     flag = 0;
+                     break;
+                }else if(t_flag == 10){
+                     break;
+                }
+            }
+        }
+        //sem_post(&gossip_lock);//end lock
+
+
+
+        if(status[0]==0){printf("Machine 1 has failed.\n");}
+        if(status[1]==0){printf("Machine 2 has failed.\n");}
+        if(status[2]==0){printf("Machine 3 has failed.\n");}
+        if(status[3]==0){printf("Machine 4 has failed.\n");}
+        fclose(fp1);                                   // close the filepointer
+        fclose(fp2);                                   // close the filepointer
+        fclose(fp3);                                   // close the filepointer
+        fclose(fp4);                                   // close the filepointer
+
+        // Combine the .tmp results files into grep.output and delete the .tmp files
+        combine();
+        printf("Results recieved. Output located in grep.output.\n");
+
+    }else if(strncmp(message,"/test",5)==0){
+        // We sent the /test command to the others so they generated log files
+        // Now we need to do a few greps and verify that the results we get back are correct
+        int check = 0;
+        multicast("grep -k ^INFO");
+        check += verify_logs(1);
+        multicast("grep -k ^QUERY");
+        check += verify_logs(2);
+        multicast("grep -v D$");
+        check += verify_logs(3);
+        multicast("grep -v ^USER_3");
+        check += verify_logs(4);
+        if(check == 0){printf("Test success!\n");}
+        else{printf("Test failure.\n");}
+    }
+}
+
+void join(gossip_s* new_gossip){
+    printf("New Machine\n");
+    add_to_ring(new_gossip->ring_id, new_gossip->addr);
+    if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr)
+    {
+        gossip_list[1].addr = new_gossip->addr;
+        gossip_list[1].counter = new_gossip->counter;
+        gossip_list[1].p_crashed = new_gossip->p_crashed;
+        gossip_list[1].has_left = new_gossip->has_left;
+        strncpy(gossip_list[1].id, new_gossip->id, 50);
+       gossip_list[1].time =(int)time(NULL);
+       //File IO saying someone joined
+       log_event(my_id,num_machines,"join",gossip_list);
+    }
+    else
+    {
+        num_machines ++;
+
+        /*Checks the size of list and makes it bigger if needed*/
+        if(num_machines == max_machines){
+            max_machines *= 2;
+            gossip_list = realloc(gossip_list, max_machines*sizeof(gossip_s)); //Doubles the size of the list
+        }
+        /*Added the new gossip to the list*/
+        //memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
+        gossip_list[num_machines].addr = new_gossip->addr;
+        gossip_list[num_machines].counter = new_gossip->counter;
+        gossip_list[num_machines].p_crashed = new_gossip->p_crashed;
+        gossip_list[num_machines].has_left = new_gossip->has_left;
+        strncpy(gossip_list[num_machines].id, new_gossip->id, 50);
+       gossip_list[num_machines].time =(int)time(NULL);
+       //File IO saying someone joined
+       log_event(my_id,num_machines,"join",gossip_list);
+    }
+}
+void leave(int index, int type){
+
+
+
+    //file IO saying someone left
+    if(type == 1){
+        //Crashed Machine
+        if((index != 1) || (server_flag == 1)){
+            /*Erase the addrs in the list and shifts that array down*/
+            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
+            num_machines--;
+            log_event(my_id,num_machines,"crash",gossip_list);
+        }
+        else{
+            gossip_list[1].p_crashed = 2;
+            log_event(my_id,num_machines,"hostcrash",gossip_list);
+        }
+    }
+    else{
+    	if((index != 1) || (server_flag == 1)){
+            /*Erase the addrs in the list and shifts that array down*/
+            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
+            num_machines--;
+            log_event(my_id,num_machines,"leave",gossip_list);
+        }
+        else{
+            gossip_list[1].p_crashed = 2;
+            log_event(my_id,num_machines,"hostleave",gossip_list);
+        }
+    }
+}
+
+void set_leave(){
+	leaving_group_flag = 1;
+	// Clear local membership list from [2] to [END]
+	// IF(WE ARE SERVER){ clear membership list[1];}
+
+	return;
+}
+void rejoin(){
+	// Generate new ID and stuff
+	    gossip_list[0].counter = 0;
+	    gossip_list[0].time = (int)time(NULL);
+	    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
+	    gossip_list[0].p_crashed = 0;
+	    gossip_list[0].has_left = 0;
+	    leaving_group_flag = 0;
+	return;
+}
+
+void add_to_ring(int newid, struct in_addr new_addr){
+
+    ring_n* n_node;
+    ring_n* prev = NULL;
+    ring_n* current = myring;
+
+    n_node = malloc(sizeof(ring_n));
+    n_node->value = newid;
+    n_node->addr.s_addr = new_addr.s_addr;
+
+    while(current->value < newid){
+        prev = current;
+        current = current->next;
+        if(current == NULL){
+            break;
+        }
+    }
+    n_node->prev = prev;
+    n_node->next = current;
+
+    // Set prev's next pointer if prev exists
+    if(prev != NULL){
+        prev->next = n_node;
+    }
+
+    // Set current's prev pointer, if current exists
+    if(current != NULL){
+        current->prev = n_node;
+    }
+
+    if(myring == n_node->next){
+        myring = n_node;
+    }
+
+}
+
+void *grep_recv_thread_main(void *discard){
     struct sockaddr_in fromaddr;
     socklen_t len;
     int nbytes;
@@ -158,7 +479,7 @@ void *grep_recv_thread_main(void *discard) {
                     else{
                         strcpy(ret.command, "dnf_lookup");
                     }
-                   
+
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"update",6) == 0){
@@ -175,274 +496,7 @@ void *grep_recv_thread_main(void *discard) {
             }
     }
 }
-void getIP(void) {
-	struct ifaddrs *ifaddr, *ifa;
-	int family, s;
-
-
-	if (getifaddrs(&ifaddr) == -1) {
-		perror("getifaddrs");
-		exit(EXIT_FAILURE);
-	}
-
-	for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-		family = ifa->ifa_addr->sa_family;
-
-		if (family == AF_INET) {
-			s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), myIP, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-			if (s != 0) {
-					printf("getnameinfo() failed: %s\n", gai_strerror(s));
-					exit(EXIT_FAILURE);
-			}
-			if(strncmp(ifa->ifa_name, "eth0", 4) == 0){
-				printf("My IP: %s\n", myIP); //remove
-			}
-		}
-	}
-}
-void init(int type, char * servIP) {
-    int i,n;
-    int sockoptval = 1;
-    char *temp;
-    char trashinput;
-    server_flag = type;
-    getIP();
-    printf("What is my machine ID? ::>  ");
-    scanf("%d%c",&my_id,&trashinput); //gets machine id and throws away the return character
-    /* set up UDP listening socket */
-    myc_id = (char)(((int)'0')+my_id);
-    grepfd = socket(AF_INET,SOCK_DGRAM,0);
-    gossfd = socket(AF_INET,SOCK_DGRAM,0);
-
-    if (grepfd < 0) {
-        perror("socket");
-        exit(1);
-    }
-    if (gossfd < 0) {
-        perror("socket");
-        exit(1);
-    }
-    setsockopt(grepfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
-    setsockopt(gossfd, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int));
-
-
-    memset(&myaddr,0,sizeof(myaddr));
-    memset(&mygaddr,0,sizeof(mygaddr));
-    myaddr.sin_family = AF_INET;
-    mygaddr.sin_family = AF_INET;
-    myaddr.sin_addr.s_addr = inet_addr(myIP);
-    mygaddr.sin_addr.s_addr = inet_addr(myIP);
-    myaddr.sin_port = htons(9090);
-    mygaddr.sin_port = htons(9091);
-
-    if (bind(grepfd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) {
-        perror("bind");
-       exit(1);
-    }
-    if (bind(gossfd, (struct sockaddr *)&mygaddr, sizeof(mygaddr)) < 0) {
-        perror("bind");
-        exit(1);
-    }
-
-    /* Initialize the semaphore */
-    sem_init(&gossip_lock,0,1);
-
-
-
-    /*Setting Up Gossip List*/
-    num_machines = 0;
-    max_machines = 10;
-    gossip_list = malloc(10*sizeof(gossip_s));
-
-    /*Add self to the gossip list*/
-    gossip_list[0].addr.s_addr = myaddr.sin_addr.s_addr;
-    gossip_list[0].counter = 0;
-    gossip_list[0].time = (int)time(NULL);
-    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
-    gossip_list[0].p_crashed = 0;
-    gossip_list[0].has_left = 0;
-    gossip_list[0].has_left = 0;
-    /*MP3*/
-    gossip_list[0].ring_id= my_id;
-    if(type == 0)
-    {
-        gossip_list[1].addr.s_addr = inet_addr(servIP);
-        gossip_list[1].counter = 0;
-        gossip_list[1].time = (int)time(NULL);
-        sprintf(gossip_list[1].id,"%d-%d",my_id,(int)time(NULL));
-        gossip_list[1].p_crashed = 0;
-        gossip_list[1].has_left = 0;
-        num_machines = 1;
-    }
-    else{
-        printf("My IP: %s\n", myIP);
-    }
-
-    if (pthread_create(&grep_recv_thread, NULL, &grep_recv_thread_main, NULL) != 0) {
-        fprintf(stderr, "Error in pthread_create\n");
-        exit(1);
-    }
-    if (pthread_create(&goss_recv_thread, NULL, &goss_recv_thread_main, NULL) != 0) {
-        fprintf(stderr, "Error in pthread_create\n");
-        exit(1);
-    }
-    /*Starting Gossip thread*/
-    if (pthread_create(&gossip_thread, NULL, &gossip_thread_main, NULL) != 0) {
-        fprintf(stderr, "Error in pthread_create\n");
-        exit(1);
-    }
-    if (pthread_create(&monitor_thread, NULL, &monitor_thread_main, NULL) != 0) {
-        fprintf(stderr, "Error in pthread_create\n");
-        exit(1);
-    }
-
-    /*Ring Initialization*/
-    myring = malloc(sizeof(ring_n));
-    myring->value = my_id;
-    myring->next = NULL;
-    myring->prev = NULL;
-    myring->addr.s_addr = myaddr.sin_addr.s_addr;
-
-
-}
-void multicast(const char *message) {
-
-    int i;
-    mess_s value;
-    strcpy(value.command, message);
-    struct sockaddr_in sendaddr;
-    if(strncmp(message,"grep",4)==0){
-    	for(i = 0; i<4; i++){
-    		status[i]=0;
-    	}
-        flag = 0;
-        fp1 = fopen("result1.tmp","w");
-        fp2 = fopen("result2.tmp","w");
-        fp3 = fopen("result3.tmp","w");
-        fp4 = fopen("result4.tmp","w");
-
-
-        memset(&sendaddr, 0, sizeof(sendaddr));
-        sendaddr.sin_family = AF_INET;
-        sendaddr.sin_port = htons(9090); //This is the port for grep communication
-
-        //sem_wait(&gossip_lock);//lock
-        for(i =0; i<=num_machines; i++)
-        {
-            sendaddr.sin_addr.s_addr = gossip_list[i].addr.s_addr;
-            sendto(grepfd, &value, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
-            t_flag = 0;
-            while(1){
-                sleep(1);
-                t_flag += 1;
-                if(flag == 1){
-                     flag = 0;
-                     break;
-                }else if(t_flag == 10){
-                     break;
-                }
-            }
-        }
-        //sem_post(&gossip_lock);//end lock
-
-
-
-        if(status[0]==0){printf("Machine 1 has failed.\n");}
-        if(status[1]==0){printf("Machine 2 has failed.\n");}
-        if(status[2]==0){printf("Machine 3 has failed.\n");}
-        if(status[3]==0){printf("Machine 4 has failed.\n");}
-        fclose(fp1);                                   // close the filepointer
-        fclose(fp2);                                   // close the filepointer
-        fclose(fp3);                                   // close the filepointer
-        fclose(fp4);                                   // close the filepointer
-
-        // Combine the .tmp results files into grep.output and delete the .tmp files
-        combine();
-        printf("Results recieved. Output located in grep.output.\n");
-
-    }else if(strncmp(message,"/test",5)==0){
-        // We sent the /test command to the others so they generated log files
-        // Now we need to do a few greps and verify that the results we get back are correct
-        int check = 0;
-        multicast("grep -k ^INFO");
-        check += verify_logs(1);
-        multicast("grep -k ^QUERY");
-        check += verify_logs(2);
-        multicast("grep -v D$");
-        check += verify_logs(3);
-        multicast("grep -v ^USER_3");
-        check += verify_logs(4);
-        if(check == 0){printf("Test success!\n");}
-        else{printf("Test failure.\n");}
-    }
-}
-void join(gossip_s* new_gossip){
-    printf("New Machine\n");
-    add_to_ring(new_gossip->ring_id, new_gossip->addr);
-    if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr)
-    {
-        gossip_list[1].addr = new_gossip->addr;
-        gossip_list[1].counter = new_gossip->counter;
-        gossip_list[1].p_crashed = new_gossip->p_crashed;
-        gossip_list[1].has_left = new_gossip->has_left;
-        strncpy(gossip_list[1].id, new_gossip->id, 50);
-       gossip_list[1].time =(int)time(NULL);
-       //File IO saying someone joined
-       log_event(my_id,num_machines,"join",gossip_list);
-    }
-    else
-    {
-        num_machines ++;
-
-        /*Checks the size of list and makes it bigger if needed*/
-        if(num_machines == max_machines){
-            max_machines *= 2;
-            gossip_list = realloc(gossip_list, max_machines*sizeof(gossip_s)); //Doubles the size of the list
-        }
-        /*Added the new gossip to the list*/
-        //memcpy(&gossip_list[num_machines], new_gossip, sizeof(gossip_s));
-        gossip_list[num_machines].addr = new_gossip->addr;
-        gossip_list[num_machines].counter = new_gossip->counter;
-        gossip_list[num_machines].p_crashed = new_gossip->p_crashed;
-        gossip_list[num_machines].has_left = new_gossip->has_left;
-        strncpy(gossip_list[num_machines].id, new_gossip->id, 50);
-       gossip_list[num_machines].time =(int)time(NULL);
-       //File IO saying someone joined
-       log_event(my_id,num_machines,"join",gossip_list);
-    }
-}
-void leave(int index, int type){
-
-
-
-    //file IO saying someone left
-    if(type == 1){
-        //Crashed Machine
-        if((index != 1) || (server_flag == 1)){
-            /*Erase the addrs in the list and shifts that array down*/
-            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
-            num_machines--;
-            log_event(my_id,num_machines,"crash",gossip_list);
-        }
-        else{
-            gossip_list[1].p_crashed = 2;
-            log_event(my_id,num_machines,"hostcrash",gossip_list);
-        }
-    }
-    else{
-    	if((index != 1) || (server_flag == 1)){
-            /*Erase the addrs in the list and shifts that array down*/
-            memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
-            num_machines--;
-            log_event(my_id,num_machines,"leave",gossip_list);
-        }
-        else{
-            gossip_list[1].p_crashed = 2;
-            log_event(my_id,num_machines,"hostleave",gossip_list);
-        }
-    }
-}
-void *goss_recv_thread_main(void *discard) {
+void *goss_recv_thread_main(void *discard){
     struct sockaddr_in fromaddr;
     socklen_t len;
     int nbytes,i,j;
@@ -513,7 +567,7 @@ void *goss_recv_thread_main(void *discard) {
         }
     }
 }
-void *gossip_thread_main(void *discard) {
+void *gossip_thread_main(void *discard){
     int i, j,k;
     int index;
     int * index_array;
@@ -582,7 +636,7 @@ void *gossip_thread_main(void *discard) {
         usleep(200000);//wait
     }
 }
-void *monitor_thread_main(void *discard) {
+void *monitor_thread_main(void *discard){
     int i;
     int tempt;
 
@@ -624,56 +678,4 @@ void *monitor_thread_main(void *discard) {
     }
 
 
-}
-void set_leave(){
-	leaving_group_flag = 1;
-	// Clear local membership list from [2] to [END]
-	// IF(WE ARE SERVER){ clear membership list[1];}
-
-	return;
-}
-void rejoin(){
-	// Generate new ID and stuff
-	    gossip_list[0].counter = 0;
-	    gossip_list[0].time = (int)time(NULL);
-	    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
-	    gossip_list[0].p_crashed = 0;
-	    gossip_list[0].has_left = 0;
-	    leaving_group_flag = 0;
-	return;
-}
-void add_to_ring(int newid, struct in_addr new_addr){
-
-    ring_n* n_node;
-    ring_n* prev = NULL;
-    ring_n* current = myring;
-
-    n_node = malloc(sizeof(ring_n));
-    n_node->value = newid;
-    n_node->addr.s_addr = new_addr.s_addr;
-
-    while(current->value < newid){
-        prev = current;
-        current = current->next;
-        if(current == NULL){
-            break;
-        }
-    }
-    n_node->prev = prev;
-    n_node->next = current;
-
-    // Set prev's next pointer if prev exists
-    if(prev != NULL){
-        prev->next = n_node;
-    }
-
-    // Set current's prev pointer, if current exists
-    if(current != NULL){
-        current->prev = n_node;
-    }
-    
-    if(myring == n_node->next){
-        myring = n_node;
-    }
-    
 }
