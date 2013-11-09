@@ -656,4 +656,9 @@ void add_to_ring(int newid, struct in_addr new_addr){
     if(current != NULL){
         current->prev = n_node;
     }
+    
+    if(myring == n_node->next){
+        myring = n_node;
+    }
+    
 }
