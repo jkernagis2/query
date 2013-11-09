@@ -265,6 +265,7 @@ void join(gossip_s* new_gossip){
         gossip_list[1].has_left = new_gossip->has_left;
         strncpy(gossip_list[1].id, new_gossip->id, 50);
        gossip_list[1].time =(int)time(NULL);
+       gossip_list[1].ring_id = new_gossip->ring_id;
        //File IO saying someone joined
        log_event(my_id,num_machines,"join",gossip_list);
     }
@@ -285,6 +286,7 @@ void join(gossip_s* new_gossip){
         gossip_list[num_machines].has_left = new_gossip->has_left;
         strncpy(gossip_list[num_machines].id, new_gossip->id, 50);
        gossip_list[num_machines].time =(int)time(NULL);
+       gossip_list[num_machines].ring_id = new_gossip->ring_id;
        //File IO saying someone joined
        log_event(my_id,num_machines,"join",gossip_list);
     }
