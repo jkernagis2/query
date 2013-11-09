@@ -354,7 +354,7 @@ void multicast(const char *message) {
 }
 
 void join(gossip_s* new_gossip){
-    //add_to_ring(new_gossip->ring_id, new_gossip->addr)
+    add_to_ring(new_gossip->ring_id, new_gossip->addr)
     if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr)
     {
         gossip_list[1].addr = new_gossip->addr;

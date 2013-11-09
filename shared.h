@@ -50,12 +50,29 @@ typedef struct{
     uint8_t id[50]; //
     int32_t p_crashed; //
     int32_t has_left; //
+    /*MP3*/
+    int32_t ring_id;
+    
 } gossip_s;
 
 typedef struct {
     int32_t num_gossip;
     gossip_s gossips[10];
 }gossip_m_s;
+
+typedef struct {
+    struct in_addr addr; //address
+    int value;
+    struct ring* next;
+    struct ring* prev;
+}ring;
+
+typedef struct {
+    int key; //address
+    char* value;
+    struct keyval* next;
+    struct keyval* prev;
+}keyval;
 
 
 #endif
