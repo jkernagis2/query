@@ -1,5 +1,5 @@
 make clean
-cls
+echo -en "\ec"
 make
 cp ./distrib_grep ./m1/distrib_grep
 cp ./distrib_grep ./m2/distrib_grep

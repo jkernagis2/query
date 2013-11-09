@@ -20,6 +20,9 @@
 #include <getopt.h>
 #include <arpa/inet.h>
 
+extern keyval* mykv;
+extern ring_n* myring;
+
 struct sockaddr_in myaddr;
 struct sockaddr_in mygaddr;
 
@@ -626,13 +629,13 @@ void rejoin(){
 void add_to_ring(int newid, struct in_addr new_addr){
     ring_n* temp;
     ring_n* temp_prev;
-    ring_n* n_node;
+    struct ring_n* n_node;
 
-    n_node = malloc(sizeof(ring_n));
+    n_node = malloc(sizeof(struct ring_n));
     n_node->value = newid;
     n_node->addr.s_addr = new_addr.s_addr;
 
-    for(temp == myring; temp != NULL; temp = temp->next)
+    for(temp = myring; temp != NULL; temp = temp->next)
     {
         n_node->prev = temp->prev;
         if(newid < temp->value)
