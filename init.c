@@ -629,7 +629,6 @@ void rejoin(){
 }
 void add_to_ring(int newid, struct in_addr new_addr){
     ring_n* temp;
-    ring_n* temp_prev;
     ring_n* n_node;
 
     n_node = malloc(sizeof(ring_n));
@@ -641,11 +640,11 @@ void add_to_ring(int newid, struct in_addr new_addr){
         if(newid < temp->value)
         {
             n_node->next = temp;
-            temp -> prev = n_node;
             if(temp->prev != NULL)
             {
                 (temp->prev)->next = n_node;
             }
+            temp -> prev = n_node;
             break;
         }
         n_node->prev = temp;
