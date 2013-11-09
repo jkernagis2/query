@@ -52,6 +52,9 @@ void local_insert(int key, char* value)
         if(current != NULL){
             current->prev = new_key;
         }
+        if(mykv == new_key->next){
+            mykv = new_key;
+        }
     }
 }
 
@@ -157,9 +160,9 @@ struct in_addr get_addr(int key)
 {
     ring_n* temp;
 
-    for(temp == myring; temp != NULL; temp = temp->next)
+    for(temp = myring; temp != NULL; temp = temp->next)
     {
-        if(key < temp->value)
+        if(key <= temp->value)
         {
             return temp->addr;
         }

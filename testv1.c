@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     char key[8];
     
     while (1) {
-    memset(key,0,8*sizeof(char));
+    memset(key,'\0',8*sizeof(char));
         char str[256];
         int len;
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
             local_show();
         }
 
-        multicast(str);
+        //multicast(str);
     }
 
     return 0;
