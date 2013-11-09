@@ -1,7 +1,7 @@
 #include "init.h"
 #include "d_grep.h"
 #include "shared.h"
-
+#include "keys.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -150,13 +150,21 @@ void *grep_recv_thread_main(void *discard) {
                     local_insert(buff.nid, buff.message);
                 }
                 else if(strncmp(buf,"lookup",6) == 0){
-                    local_lookup(buff.nid);
+                    mess_s ret;
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    ret.nid = buff.nid;
+                    strcpy(ret.command, "lookup_r");
+                    strcpy(ret.message,local_lookup(buff.nid));
+                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"update",6) == 0){
                     local_update(buff.nid, buff.message);
                 }
                 else if(strncmp(buf,"delete",6) == 0){
                     local_delete(buff.nid);
+                }
+                else if(strncmp(buf,"lookup_r",8) == 0){
+                   printf("Key %d has value: %s\n",buff.nid,buff.message);
                 }
             }
     }
