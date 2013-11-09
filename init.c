@@ -576,7 +576,7 @@ void *monitor_thread_main(void *discard) {
         tempt = (int)time(NULL);
         for(i = 1; i<=num_machines; i++)
         {
-            printf("Checking\n");
+            //printf("Checking\n");
             if((i == 1) && (gossip_list[1].p_crashed == 2)){continue;}
             if(gossip_list[i].has_left == 1)
             {
@@ -588,7 +588,7 @@ void *monitor_thread_main(void *discard) {
             }
             else if(gossip_list[i].p_crashed == 1) 
             {
-                printf("Starting to Crash\n");
+                //printf("Starting to Crash\n");
                 if((int)(tempt-gossip_list[i].time) > 4/*NEED CHANGE*/) 
                 {
                     printf("Crashing\n");
@@ -600,7 +600,7 @@ void *monitor_thread_main(void *discard) {
             {
                 gossip_list[i].p_crashed =1;
             }
-            printf("Time diff = %d   i = %d\n",(int)(tempt-gossip_list[i].time), i);
+            //printf("Time diff = %d   i = %d\n",(int)(tempt-gossip_list[i].time), i);
         }
         sem_post(&gossip_lock);//end lock
         sleep(1);//wait
