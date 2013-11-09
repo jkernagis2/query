@@ -1,10 +1,6 @@
 #ifndef INIT_H_
 #define INIT_H_
 
-//extern void init(void);
-
-//extern void multicast(const char *message);
-
 #include "d_grep.h"
 #include "shared.h"
 #include <semaphore.h>

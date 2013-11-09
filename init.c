@@ -1,7 +1,18 @@
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//                              init.c                                  //
+//  Function definitions for gossiping membership lists + heartbeats,   //
+//  receiving incoming messages, key-value store ring management, etc;  //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
+// Our files
 #include "init.h"
 #include "d_grep.h"
 #include "shared.h"
 #include "keys.h"
+
+// Libraries
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -20,42 +31,50 @@
 #include <getopt.h>
 #include <arpa/inet.h>
 
+// Externs
 extern keyval* mykv;
 extern ring_n* myring;
 
+// Socket stuff
 struct sockaddr_in myaddr;
 struct sockaddr_in mygaddr;
 
-gossip_s* gossip_list; //Needs to be initialized in init
-int num_machines; //Needs to be initialized in init
-int max_machines; //Needs to be initialized in init
+// Membership list and counter variables
+gossip_s* gossip_list;
+volatile int num_machines;
+volatile int max_machines;
 
-
+// Int flags and semaphore
 volatile int leaving_group_flag = 0;
-
+volatile int flag;
+volatile int t_flag;
+volatile int server_flag;
+volatile int status[4];
 sem_t gossip_lock;
+
+// Socket Descriptors
 int grepfd;
 int gossfd;
 
+// Global machine ID and IP variables
 int my_id;
+char myc_id;
+char myIP[NI_MAXHOST];
+
+// Old file pointers from MP1
 FILE* fp1;
 FILE* fp2;
 FILE* fp3;
 FILE* fp4;
-int flag,t_flag;
-char myc_id;
-char myIP[NI_MAXHOST];
-int server_flag;
 
-
+// Threads
 pthread_t grep_recv_thread;
 pthread_t goss_recv_thread;
 pthread_t gossip_thread;
 pthread_t monitor_thread;
 
-
+// Static file name array used in MP1
 char lf[11] = "resulti.tmp";
-int status[4];
 
 void *grep_recv_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
@@ -203,8 +222,6 @@ void getIP(void) {
 		}
 	}
 }
-
-//void init(void) {
 void init(int type, char * servIP) {
     int i,n;
     int sockoptval = 1;
@@ -381,7 +398,6 @@ void multicast(const char *message) {
         else{printf("Test failure.\n");}
     }
 }
-
 void join(gossip_s* new_gossip){
     printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
@@ -417,8 +433,6 @@ void join(gossip_s* new_gossip){
        log_event(my_id,num_machines,"join",gossip_list);
     }
 }
-
-
 void leave(int index, int type){
 
 
@@ -450,7 +464,6 @@ void leave(int index, int type){
         }
     }
 }
-
 void *goss_recv_thread_main(void *discard) {
     struct sockaddr_in fromaddr;
     socklen_t len;
@@ -634,7 +647,6 @@ void *monitor_thread_main(void *discard) {
 
 
 }
-
 void set_leave(){
 	leaving_group_flag = 1;
 	// Clear local membership list from [2] to [END]
@@ -642,7 +654,6 @@ void set_leave(){
 
 	return;
 }
-
 void rejoin(){
 	// Generate new ID and stuff
 	    gossip_list[0].counter = 0;
