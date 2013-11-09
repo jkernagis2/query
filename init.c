@@ -28,7 +28,7 @@ int num_machines; //Needs to be initialized in init
 int max_machines; //Needs to be initialized in init
 
 /*MP3*/
-ring* myring;
+ring_n* myring;
 keyval* mykv;
 
 volatile int leaving_group_flag = 0;
@@ -273,7 +273,7 @@ void init(int type, char * servIP) {
     }
 
     /*Ring Initialization*/
-    myring = malloc(sizeof(ring));
+    myring = malloc(sizeof(ring_n));
     myring->value = my_id;
     myring->next = NULL;
     myring->prev = NULL;
@@ -354,7 +354,7 @@ void multicast(const char *message) {
 }
 
 void join(gossip_s* new_gossip){
-    //add_to_ring(new_gossip->ring_id, new_gossip->addr)
+    add_to_ring(new_gossip->ring_id, new_gossip->addr);
     if(new_gossip->addr.s_addr == gossip_list[1].addr.s_addr)
     {
         gossip_list[1].addr = new_gossip->addr;
@@ -623,6 +623,51 @@ void rejoin(){
 	    leaving_group_flag = 0;
 	return;
 }
-void add_to_ring(int newid){
+void add_to_ring(int newid, struct in_addr new_addr){
+    ring_n* temp;
+    ring_n* temp_prev;
+    ring_n* n_node;
+
+    n_node = malloc(sizeof(ring_n));
+    n_node->value = newid;
+    n_node->addr.s_addr = new_addr.s_addr;
+
+    for(temp == myring; temp != NULL; temp = temp->next)
+    {
+        n_node->prev = temp->prev;
+        if(newid < temp->value)
+        {
+            n_node->next = temp;
+            temp -> prev = n_node;
+            if(temp->prev != NULL)
+            {
+                (temp->prev)->next = n_node;
+            }
+            break;
+        }
+    }
+    if(temp == NULL)
+    {
+       n_node->next = NULL;
+       if(n_node->prev != NULL)
+       {
+                (n_node->prev)->next = n_node;
+       }
+        
+    }
 }
+struct in_addr get_addr(int key)
+{
+    ring_n* temp;
+
+    for(temp == myring; temp != NULL; temp = temp->next)
+    {
+        if(key < temp->value)
+        {
+            return temp->addr;
+        }
+    }
+    return myring->addr;
+}
+
 

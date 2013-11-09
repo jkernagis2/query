@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     char key[8];
     
     while (1) {
-    memset(key,0,8*sizeof(char));
+    memset(key,0,8*sizeof(key));
         char str[256];
         int len;
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
         len = strlen(str);
         /* trim newline */
         if (str[len-1] == '\n') {
-            str[len-1] = '\0';
+            str[len-1] = 0;
         }
         if (strncmp(str, "/quit", 5) == 0) {
             break;
@@ -56,18 +56,16 @@ int main(int argc, char **argv) {
         }else if(strncmp(str, "/insert",7) == 0){
             for(i = 8; str[i] != ' '; i++){}
             strncpy(key,&str[8], i-8);
-        	insert(atoi(key), &str[i+1]);
+        	insert();
         }
         }else if(strncmp(str, "/lookup",7) == 0){
-        	lookup(atoi(&str[8]));
+        	lookup();
         }
         }else if(strncmp(str, "/update",7) == 0){
-            for(i = 8; str[i] != ' '; i++){}
-            strncpy(key,&str[8], i-8);
-        	update(atoi(key), &str[i+1]);
+        	update();
         }
         }else if(strncmp(str, "/delete",7) == 0){
-        	delete(atoi(&str[8]));
+        	delete();
         }
 
         multicast(str);

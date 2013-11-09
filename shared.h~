@@ -63,8 +63,8 @@ typedef struct {
 typedef struct ring_n{
     struct in_addr addr; //address
     int value;
-    struct ring_n* next;
-    struct ring_n* prev;
+    ring_n* next;
+    ring_n* prev;
 }ring_n;
 
 typedef struct {
