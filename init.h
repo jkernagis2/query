@@ -1,31 +1,47 @@
 #ifndef INIT_H_
 #define INIT_H_
 
-#include "d_grep.h"
+// Our files
 #include "shared.h"
-#include <semaphore.h>
+#include "d_grep.h"
+#include "keys.h"
+
+// Libraries
+#include <arpa/inet.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <getopt.h>
+#include <ifaddrs.h>
 #include <math.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /*MP3*/
 ring_n* myring;
 keyval* mykv;
 
+void init(int type, char * servIP);
+void getIP(void);
+
+void multicast(const char *message);
+void join(gossip_s* new_gossip);
+void leave(int index, int type);
+void add_to_ring(int newid, struct in_addr new_addr);
+
 void *grep_recv_thread_main(void *discard);
 void *goss_recv_thread_main(void *discard);
 void *gossip_thread_main(void *discard);
 void *monitor_thread_main(void *discard);
-
-void getIP(void);
-
-void join(gossip_s* new_gossip);
-void leave(int index, int type);
-
-
-void add_to_ring(int newid, struct in_addr new_addr);
-
-
-void init(int type, char * servIP);
-
-void multicast(const char *message);
 
 #endif
