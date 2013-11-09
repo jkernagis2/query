@@ -33,6 +33,8 @@ typedef struct {
 #include <getopt.h>
 #include <arpa/inet.h>
 
+#define TEST_MODE 1
+
 /* Basic message struct used for socket communications. */
 typedef struct {
     char id;

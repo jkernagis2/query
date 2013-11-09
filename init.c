@@ -662,14 +662,18 @@ void *monitor_thread_main(void *discard){
                 //printf("Starting to Crash\n");
                 if((int)(tempt-gossip_list[i].time) > 4/*NEED CHANGE*/)
                 {
-                    printf("Crashing\n");
-                    leave(i, 1);
+                    if(TEST_MODE != 1){
+                        printf("Crashing\n");
+                        leave(i, 1);
+                    }
                 }
                 continue;
             }
             else if((int)(tempt-gossip_list[i].time) > 2/*NEED CHANGE*/)
             {
-                gossip_list[i].p_crashed =1;
+                if(TEST_MODE != 1){
+                    gossip_list[i].p_crashed =1;
+                }
             }
             //printf("Time diff = %d   i = %d\n",(int)(tempt-gossip_list[i].time), i);
         }
