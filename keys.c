@@ -178,7 +178,7 @@ void update(int key, char* new_val){
     memset(&message,'\0',sizeof(message));
     message.nid = key;
     strncpy(message.command,"update",6);
-    strncpy(message.message,val,strlen(val));
+    strncpy(message.message,new_val,strlen(val));
     
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
 }
