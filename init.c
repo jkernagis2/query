@@ -92,7 +92,7 @@ void *grep_recv_thread_main(void *discard) {
                     strcpy(lft, lf);                    // Copy base filename string into this buffer "resulti.tmp"
                     lft[6] = buff.id;                   // Set id number for file
                     int b_read;
-                    
+
                     switch(buff.id){
                         case '1':
                             fwrite(buff.message, buff.bytes_sent, 1, fp1); // write the number of bytes sent in the message
@@ -192,7 +192,7 @@ void init(int type, char * servIP) {
     myc_id = (char)(((int)'0')+my_id);
     grepfd = socket(AF_INET,SOCK_DGRAM,0);
     gossfd = socket(AF_INET,SOCK_DGRAM,0);
-    
+
     if (grepfd < 0) {
         perror("socket");
         exit(1);
@@ -299,7 +299,7 @@ void multicast(const char *message) {
         fp2 = fopen("result2.tmp","w");
         fp3 = fopen("result3.tmp","w");
         fp4 = fopen("result4.tmp","w");
-        
+
 
         memset(&sendaddr, 0, sizeof(sendaddr));
         sendaddr.sin_family = AF_INET;
@@ -396,7 +396,7 @@ void join(gossip_s* new_gossip){
 void leave(int index, int type){
 
 
-    
+
     //file IO saying someone left
     if(type == 1){
         //Crashed Machine
@@ -467,7 +467,7 @@ void *goss_recv_thread_main(void *discard) {
                         {
                             /*Updates List*/
                             if(buff.gossips[i].counter > gossip_list[j].counter)
-                            { 
+                            {
                                 gossip_list[j].counter = buff.gossips[i].counter;
                                 gossip_list[j].p_crashed = buff.gossips[i].p_crashed;
                                 gossip_list[j].has_left = buff.gossips[i].has_left;
@@ -491,7 +491,7 @@ void *goss_recv_thread_main(void *discard) {
                 }
 
              }
-       
+
         sem_post(&gossip_lock);//endlock
         }
     }
@@ -513,7 +513,7 @@ void *gossip_thread_main(void *discard) {
     for(;;)
     {
         sem_wait(&gossip_lock);//lock
-        
+
     	if(leaving_group_flag == 1)
     	{
     		leaving_group_flag++;
@@ -532,7 +532,7 @@ void *gossip_thread_main(void *discard) {
             sem_post(&gossip_lock);//end lock
     	    continue;
     	}
-    	
+
         gossip_list[0].counter++; //increase heartbeat
         tnm = num_machines;
         index_array = malloc(num_machines*sizeof(int));
@@ -586,10 +586,10 @@ void *monitor_thread_main(void *discard) {
                 }
                 continue;
             }
-            else if(gossip_list[i].p_crashed == 1) 
+            else if(gossip_list[i].p_crashed == 1)
             {
                 //printf("Starting to Crash\n");
-                if((int)(tempt-gossip_list[i].time) > 4/*NEED CHANGE*/) 
+                if((int)(tempt-gossip_list[i].time) > 4/*NEED CHANGE*/)
                 {
                     printf("Crashing\n");
                     leave(i, 1);
@@ -613,7 +613,7 @@ void set_leave(){
 	leaving_group_flag = 1;
 	// Clear local membership list from [2] to [END]
 	// IF(WE ARE SERVER){ clear membership list[1];}
-	
+
 	return;
 }
 
@@ -628,34 +628,32 @@ void rejoin(){
 	return;
 }
 void add_to_ring(int newid, struct in_addr new_addr){
-    ring_n* temp;
+
     ring_n* n_node;
+    ring_n* prev = NULL;
+    ring_n* current = myring;
 
     n_node = malloc(sizeof(ring_n));
     n_node->value = newid;
     n_node->addr.s_addr = new_addr.s_addr;
 
-    for(temp = myring; temp != NULL; temp = temp->next)
-    {
-        if(newid < temp->value)
-        {
-            n_node->next = temp;
-            if(temp->prev != NULL)
-            {
-                (temp->prev)->next = n_node;
-            }
-            temp -> prev = n_node;
+    while(current->value < newid){
+        prev = current;
+        current = current->next;
+        if(current == NULL){
             break;
         }
-        n_node->prev = temp;
     }
-    if(temp == NULL)
-    {
-       n_node->next = NULL;
-       (n_node->prev)->next = n_node;
+    n_node->prev = prev;
+    n_node->next = current;
 
+    // Set prev's next pointer if prev exists
+    if(prev != NULL){
+        prev->next = n_node;
+    }
+
+    // Set current's prev pointer, if current exists
+    if(current != NULL){
+        current->prev = n_node;
     }
 }
-
-
-
