@@ -10,6 +10,10 @@
 #include <semaphore.h>
 #include <math.h>
 
+/*MP3*/
+ring_n* myring;
+keyval* mykv;
+
 void *grep_recv_thread_main(void *discard);
 void *goss_recv_thread_main(void *discard);
 void *gossip_thread_main(void *discard);
@@ -22,7 +26,6 @@ void leave(int index, int type);
 
 
 void add_to_ring(int newid, struct in_addr new_addr);
-struct in_addr get_addr(int key);
 
 
 void init(int type, char * servIP);

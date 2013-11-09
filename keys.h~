@@ -11,7 +11,7 @@
 #include "shared.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "init.h"
+#include "init.c"
 
 extern keyval* mykv;
 extern ring_n* myring;

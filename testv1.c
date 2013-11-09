@@ -2,6 +2,7 @@
 #include "init.h"
 #include "logs.h"
 #include "d_grep.h"
+#include "keys.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+
 
 
 
@@ -52,22 +54,20 @@ int main(int argc, char **argv) {
         	set_leave();
         }else if(strncmp(str, "/rejoin",7) == 0){
         	rejoin();
-        }
         }else if(strncmp(str, "/insert",7) == 0){
             for(i = 8; str[i] != ' '; i++){}
             strncpy(key,&str[8], i-8);
         	insert(atoi(key), &str[i+1]);
-        }
         }else if(strncmp(str, "/lookup",7) == 0){
         	lookup(atoi(&str[8]));
-        }
         }else if(strncmp(str, "/update",7) == 0){
             for(i = 8; str[i] != ' '; i++){}
             strncpy(key,&str[8], i-8);
         	update(atoi(key), &str[i+1]);
-        }
         }else if(strncmp(str, "/delete",7) == 0){
-        	delete(atoi(&str[8]));
+        	delete_k(atoi(&str[8]));
+        }else if(strncmp(str, "/show",5) == 0){
+            local_show();
         }
 
         multicast(str);

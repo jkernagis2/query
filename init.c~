@@ -27,9 +27,6 @@ gossip_s* gossip_list; //Needs to be initialized in init
 int num_machines; //Needs to be initialized in init
 int max_machines; //Needs to be initialized in init
 
-/*MP3*/
-ring_n* myring;
-keyval* mykv;
 
 volatile int leaving_group_flag = 0;
 
@@ -118,7 +115,7 @@ void *grep_recv_thread_main(void *discard) {
                     d_grep(buf,my_id);                  // Call the d_grep function
                     mess_s ret;                         // make a mess_s struction
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
-		    if(fromaddr.sin_addr.s_addr != gossip_list[0].addr.s_addr){
+		            if(fromaddr.sin_addr.s_addr != gossip_list[0].addr.s_addr){
                         char lft[11];
                         strcpy(lft, lf);
                         lft[6] = myc_id;
@@ -145,6 +142,10 @@ void *grep_recv_thread_main(void *discard) {
                     ret.nid = my_id;
                     strcpy(ret.command, "done");
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                }
+                else if(strncmp(buf,"insert",6) == 0){
+                {
+                    local_insert(buff.nid, buff.message);
                 }
             }
     }
@@ -656,18 +657,6 @@ void add_to_ring(int newid, struct in_addr new_addr){
         
     }
 }
-struct in_addr get_addr(int key)
-{
-    ring_n* temp;
 
-    for(temp == myring; temp != NULL; temp = temp->next)
-    {
-        if(key < temp->value)
-        {
-            return temp->addr;
-        }
-    }
-    return myring->addr;
-}
 
 

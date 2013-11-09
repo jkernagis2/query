@@ -67,7 +67,7 @@ typedef struct ring_n{
     struct ring_n* prev;
 }ring_n;
 
-typedef struct {
+typedef struct keyval{
     int key;
     char* value;
     struct keyval* next;

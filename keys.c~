@@ -147,11 +147,11 @@ void insert(int key, char* val){
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;  
 }
 
-void lookup(int key){}
+//void lookup(int key);
 
-void update(int key, char* new_val){}
+//void update(int key, char* new_val);
 
-void delete_k(int key){}
+//void delete_k(int key);
 
 struct in_addr get_addr(int key)
 {
