@@ -508,10 +508,10 @@ void *goss_recv_thread_main(void *discard){
     gossip_m_s buff;
     char rbuff[1024];
     for (;;) {
+        if(leaving_group_flag != 0){continue;}
         int source;
         len = sizeof(fromaddr);
-        //nbytes = recvfrom(sockfd,&buff,sizeof(mess_s),0,(struct sockaddr *)&fromaddr,&len);
-	nbytes = recvfrom(gossfd,&buff,sizeof(gossip_m_s),0,(struct sockaddr *)&fromaddr,&len);
+        nbytes = recvfrom(gossfd,&buff,sizeof(gossip_m_s),0,(struct sockaddr *)&fromaddr,&len);
         if (nbytes < 0){
             if (errno == EINTR)
                 continue;
@@ -552,16 +552,16 @@ void *goss_recv_thread_main(void *discard){
                     {
                         break;
                     }
-                 }
-                 if(j > num_machines)
-                 {
-                     if(buff.gossips[i].has_left == 0 && buff.gossips[i].p_crashed == 0)
-                     {
-                         join(&buff.gossips[i]); //adds the new gossip if its not there.
-                     }
+                }
+                if(j > num_machines)
+                {
+                    if(buff.gossips[i].has_left == 0 && buff.gossips[i].p_crashed == 0)
+                    {
+                        join(&buff.gossips[i]); //adds the new gossip if its not there.
+                    }
                 }
 
-             }
+            }
 
         sem_post(&gossip_lock);//endlock
         }
