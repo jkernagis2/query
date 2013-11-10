@@ -334,12 +334,14 @@ void set_leave(){
 }
 void rejoin(){
 	// Generate new ID and stuff
+    sem_wait(&gossip_lock);//lock
 	    gossip_list[0].counter = 0;
 	    gossip_list[0].time = (int)time(NULL);
 	    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
 	    gossip_list[0].p_crashed = 0;
 	    gossip_list[0].has_left = 0;
 	    leaving_group_flag = 0;
+    sem_post(&gossip_lock);//endlock
 	return;
 }
 
