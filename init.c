@@ -114,7 +114,7 @@ void init(int type, char * servIP){
     gossip_list[0].has_left = 0;
     gossip_list[0].has_left = 0;
     /*MP3*/
-    gossip_list[0].ring_id= my_id;
+    gossip_list[0].ring_id = get_hashed_id();
     if(type == 0)
     {
         gossip_list[1].addr.s_addr = inet_addr(servIP);
@@ -149,7 +149,7 @@ void init(int type, char * servIP){
 
     /*Ring Initialization*/
     myring = malloc(sizeof(ring_n));
-    myring->value = my_id;
+    myring->value = gossip_list[0].ring_id;
     myring->next = NULL;
     myring->prev = NULL;
     myring->addr.s_addr = myaddr.sin_addr.s_addr;

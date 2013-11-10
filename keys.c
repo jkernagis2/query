@@ -254,13 +254,13 @@ int get_hashed_id()
     unsigned char output[4];
     memset(output,'\0',4);
     OpenSSL_add_all_algorithms();
-    hash_fuction("SHA1",inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);  // THIS NEEDS MAGIC STUFF
+    the_hash("SHA1",inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);  // THIS NEEDS MAGIC STUFF
     output[2] = hash[18];
     output[3] = hash[19];
     return (int)(output[0]);
 }
 
-unsigned int hash_function(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed) {
+unsigned int the_hash(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed) {
     unsigned int md_len = -1;
     const EVP_MD *md = EVP_get_digestbyname(mode);
     if(NULL != md) {

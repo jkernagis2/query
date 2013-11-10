@@ -46,7 +46,7 @@ void shift_keys();
 void move_keys();
 
 struct in_addr get_addr(int key);
+unsigned int the_hash(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed);
 int get_hashed_id();
-unsigned int hash_function(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed);
 
 #endif // KEYS_H
