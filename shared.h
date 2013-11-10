@@ -1,20 +1,6 @@
 #ifndef __SHARED_H_
 #define __SHARED_H_
 
-
-
-
-/* Multicast message (NUL terminated) to multicast group (implicit) */
-/*void multicast(const char *message);
-
-typedef struct {
-	char id;
-	int nid;
-	char command[20];
-	char message[50000];
-    int bytes_sent;
-} mess_s;*/
-
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -48,10 +34,10 @@ typedef struct {
 typedef struct{
     struct in_addr addr; //address
     int32_t counter; //heartbeat counter
-    int32_t time; //How should time be represented?/Do we even need time?
-    uint8_t id[50]; //
-    int32_t p_crashed; //
-    int32_t has_left; //
+    int32_t time;
+    uint8_t id[50];
+    int32_t p_crashed;
+    int32_t has_left;
     /*MP3*/
     int32_t ring_id;
     
@@ -76,5 +62,9 @@ typedef struct keyval{
     struct keyval* prev;
 }keyval;
 
+typedef struct {
+    struct timeval startTime;
+    struct timeval endTime;
+} Timer;
 
 #endif

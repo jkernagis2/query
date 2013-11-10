@@ -68,6 +68,12 @@ int main(int argc, char **argv) {
         	delete_k(atoi(&str[8]));
         }else if(strncmp(str, "/show",5) == 0){
             local_show();
+        }else if(strncmp(str, "/test",5) == 0){
+            test_lookup();
+            test_insert();
+            local_show();
+        }else if(strncmp(str, "/dump",5) == 0){
+            dump_keys();
         }
 
         //multicast(str);

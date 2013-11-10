@@ -29,6 +29,7 @@ volatile int t_flag;
 volatile int server_flag;
 volatile int status[4];
 sem_t gossip_lock;
+sem_t test_lock;
 
 // Socket Descriptors
 int grepfd;
@@ -99,6 +100,7 @@ void init(int type, char * servIP){
 
     /* Initialize the semaphore */
     sem_init(&gossip_lock,0,1);
+    sem_init(&test_lock,0,1);
 
     /*Setting Up Gossip List*/
     num_machines = 0;
@@ -297,7 +299,6 @@ void leave(int index, int type){
 
 
     //file IO saying someone left
-    printf("Id being removed = %d\n", gossip_list[index].ring_id);
     remove_from_ring(gossip_list[index].ring_id);
     if(type == 1){
         //Crashed Machine
@@ -330,7 +331,7 @@ void set_leave(){
     sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
     /*Ring Management*/
-    remove_from_ring(gossip_list[0].ring_id);
+    remove_from_ring(my_id);
     move_keys();
     
     sem_post(&gossip_lock);//endlock
@@ -403,7 +404,6 @@ void add_to_ring(int newid, struct in_addr new_addr){
 void remove_from_ring(int id){
     
     ring_n* temp = myring;
-    ring_n* temp_prev;
     while(temp != NULL)
     {
         if(temp->value == id)
@@ -413,10 +413,6 @@ void remove_from_ring(int id){
         temp = temp->next;
     }
     if(temp != NULL){
-        if (myring == temp)
-        {
-            myring = temp->next;
-        }
         if(temp->next !=NULL)
         {
             (temp->next)->prev = temp->prev;
@@ -425,8 +421,6 @@ void remove_from_ring(int id){
         {
             (temp->prev)->next = temp->next;
         }
-        printf("Removing = %d\n", temp);
-        printf("Myring = %d\n", myring);
         free(temp);
     }
 }
@@ -522,6 +516,12 @@ void *grep_recv_thread_main(void *discard){
                 }
                 else if(strncmp(buf,"insert",6) == 0){
                     local_insert(buff.nid, buff.message);
+                    mess_s ret;
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    ret.nid = buff.nid;
+                    strcpy(ret.command, "i_done");
+
+                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"lookup",6) == 0){
                     mess_s ret;
@@ -546,8 +546,13 @@ void *grep_recv_thread_main(void *discard){
                 }
                 else if(strncmp(buf,"r_lookup",8) == 0){
                    printf("Key %d has value: %s\n",buff.nid,buff.message);
+                   sem_post(&test_lock);
                 }else if(strncmp(buf,"dnf_lookup",10) == 0){
                    printf("Key %d was not found.\n",buff.nid);
+                   sem_post(&test_lock);
+                }else if(strncmp(buf,"i_done",6) == 0){
+                   printf("Key insert finished.\n");
+                   sem_post(&test_lock);
                 }
             }
     }

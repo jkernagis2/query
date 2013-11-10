@@ -9,9 +9,10 @@
 #define KEYS_H
 
 #include "shared.h"
+#include "init.h"
+#include <semaphore.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "init.h"
 #include <openssl/evp.h>
 #define M_POW_VAL 256
 
@@ -20,7 +21,7 @@ extern ring_n* myring;
 extern my_id;
 extern struct sockaddr_in myaddr;
 extern int grepfd;
-
+extern sem_t test_lock;
 
 void local_insert(int key, char* val);
 
@@ -31,8 +32,6 @@ void local_update(int key, char* new_val);
 void local_delete(int key);
 
 void local_show();
-
-
 
 void insert(int key, char* val);
 
@@ -47,5 +46,13 @@ void move_keys();
 
 struct in_addr get_addr(int key);
 int get_hashed_id();
+
+void startTime(Timer* timer);
+void stopTime(Timer* timer);
+float elapsedTime(Timer timer);
+
+void test_lookup();
+void test_insert();
+void dump_keys();
 
 #endif // KEYS_H

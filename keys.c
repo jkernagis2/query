@@ -7,6 +7,8 @@
 
 #include "keys.h"
 
+volatile int lookup_requests = 0;
+
 void local_insert(int key, char* value)
 {
     // Allocate new keyval structure and linked list traversing pointers
@@ -66,6 +68,7 @@ void local_insert(int key, char* value)
 char* local_lookup(int key)
 {
     keyval* current = mykv;
+    lookup_requests++;
     while(current != NULL){
         if(current->key == key){
             return current->value;
@@ -123,21 +126,22 @@ void local_delete(int key)
 void local_show()
 {
     keyval* current = mykv;
-
+    int counter = 0;
     // Print local keys stored here
     printf("Local Keys:\n");
     while(current != NULL){
         printf("%d, ",current->key);
+        counter++;
         current = current->next;
     }
-    printf("\n\nLocal Membership List:\n");
+    printf("\nNumber Keys: %d\nLocal Membership List:\n",counter);
 
     ring_n* current_r = myring;
     while(current_r != NULL){
         printf("%d, ", current_r->value);
         current_r = current_r->next;
     }
-    printf("\n\n");
+    printf("\nLookup Requests Recieved: %d\n",lookup_requests);
 
 }
 
@@ -258,4 +262,65 @@ int get_hashed_id()
     unsigned char hash[20];
     SHA1(inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);
     return (int)(( (int) 0 ) | hash[19]);
+}
+
+void startTime(Timer* timer) {
+    gettimeofday(&(timer->startTime), NULL);
+}
+
+void stopTime(Timer* timer) {
+    gettimeofday(&(timer->endTime), NULL);
+}
+
+float elapsedTime(Timer timer) {
+    return ((float) ((timer.endTime.tv_sec - timer.startTime.tv_sec) \
+                + (timer.endTime.tv_usec - timer.startTime.tv_usec)/1.0e6));
+}
+
+void test_lookup(){
+    int i;
+    int random;
+    FILE* fp = fopen("test_lookup.csv","w");
+    Timer timer;
+    for(i = 0; i < 1000; i++){
+        random = rand() % 1000001;
+        sem_wait(&test_lock);
+        startTime(&timer);
+        lookup(random);
+        sem_wait(&test_lock);
+        stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
+        sem_post(&test_lock);
+    }
+    fclose(fp);
+}
+
+void test_insert(){
+    int i;
+    int random;
+    FILE* fp = fopen("test_insert.csv","w");
+    Timer timer;
+    for(i = 0; i < 1000; i++){
+        random = rand() % 1000001;
+        char buf[20];
+        memset(buf,'\0',20);
+        sprintf(buf, "%d", random);
+        sem_wait(&test_lock);
+        startTime(&timer);
+        insert(random,buf);
+        sem_wait(&test_lock);
+        stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
+        sem_post(&test_lock);
+    }
+    fclose(fp);
+}
+
+void dump_keys()
+{
+    FILE* fp = fopen("keys.dmp","w");
+    keyval* current = mykv;
+    while(current != NULL){
+        fprintf(fp,"%d,%s\n",current->key,current->value);
+        current = current->next;
+    }
+    fclose(fp);
 }
