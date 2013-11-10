@@ -38,7 +38,7 @@ void local_insert(int key, char* value)
                 break;
             }
         }
-        if(current-> == key){
+        if(current->key == key){
             free(new_key);
             return;
         }
