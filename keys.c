@@ -38,7 +38,10 @@ void local_insert(int key, char* value)
                 break;
             }
         }
-
+        if(current-> == key){
+            free(new_key);
+            return;
+        }
         // New key's previous pointer = prev, next pointer = current
         new_key->prev = prev;
         new_key->next = current;
