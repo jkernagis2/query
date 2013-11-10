@@ -402,6 +402,7 @@ void add_to_ring(int newid, struct in_addr new_addr){
 void remove_from_ring(int id){
     
     ring_n* temp = myring;
+    ring_n* temp_prev;
     while(temp != NULL)
     {
         if(temp->value == id)
@@ -411,6 +412,10 @@ void remove_from_ring(int id){
         temp = temp->next;
     }
     if(temp != NULL){
+        if (myring == temp)
+        {
+            myring = temp->next;
+        }
         if(temp->next !=NULL)
         {
             (temp->next)->prev = temp->prev;
