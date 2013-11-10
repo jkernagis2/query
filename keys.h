@@ -12,9 +12,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "init.h"
+#include <openssl/evp.h>
+#define M_POW_VAL 256
 
 extern keyval* mykv;
 extern ring_n* myring;
+extern my_id;
 extern struct sockaddr_in myaddr;
 extern int grepfd;
 
@@ -39,7 +42,11 @@ void update(int key, char* new_val);
 
 void delete_k(int key);
 
-struct in_addr get_addr(int key);
+void shift_keys();
+void move_keys();
 
+struct in_addr get_addr(int key);
+int get_hashed_id();
+unsigned int hash_function(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed);
 
 #endif // KEYS_H

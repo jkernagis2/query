@@ -257,6 +257,7 @@ void multicast(const char *message){
 void join(gossip_s* new_gossip){
     printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
+    shift_keys();
     if((new_gossip->addr.s_addr == gossip_list[1].addr.s_addr) && (server_flag == 0))
     {
         gossip_list[1].addr = new_gossip->addr;
@@ -296,6 +297,7 @@ void leave(int index, int type){
 
 
     //file IO saying someone left
+    remove_from_ring(gossip_list[index].ring_id);
     if(type == 1){
         //Crashed Machine
         if((index != 1) || (server_flag == 1)){
@@ -326,6 +328,10 @@ void leave(int index, int type){
 void set_leave(){
     sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
+    /*Ring Management*/
+    remove_from_ring(my_id);
+    move_keys();
+    
     sem_post(&gossip_lock);//endlock
 	// Clear local membership list from [2] to [END]
 	// IF(WE ARE SERVER){ clear membership list[1];}
@@ -378,7 +384,43 @@ void add_to_ring(int newid, struct in_addr new_addr){
     if(myring == n_node->next){
         myring = n_node;
     }
+    if(n_node->next !=NULL)
+    {
+        if(my_id == (n_node->next)->value)
+        {
+            shift_keys();
+        }
+    }
+    else{
+        if(my_id == myring->value)
+        {
+            shift_keys();
+        }
+    }
 
+}
+void remove_from_ring(int id){
+    
+    ring_n* temp = myring;
+    while(temp != NULL)
+    {
+        if(temp->value == id)
+        {
+           break;
+        }
+        temp = temp->next;
+    }
+    if(temp != NULL){
+        if(temp->next !=NULL)
+        {
+            (temp->next)->prev = temp->prev;
+        }
+        if(temp->prev !=NULL)
+        {
+            (temp->prev)->next = temp->next;
+        }
+        free(temp);
+    }
 }
 
 void *grep_recv_thread_main(void *discard){

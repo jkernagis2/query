@@ -202,14 +202,45 @@ void delete_k(int key){
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
 }
+void shift_keys(int new_id){
+    
+    keyval* temp = mykv;
+    keyval* temp_next;
+    while(temp != NULL)
+    {
+        temp_next = temp->next;
+        if(get_addr(temp->key).s_addr != myaddr.sin_addr.s_addr)
+        {
+            insert(temp->key, temp->value);
+            local_delete(temp->key);
+        }
+        temp = temp_next;
+    }
+    
+}
+void move_keys(){
+    
+    keyval* temp = mykv;
+    keyval* temp_next;
+    while(temp != NULL)
+    {
+        temp_next = temp->next;
+        insert(temp->key, temp->value);
+        local_delete(temp->key);
+        temp = temp_next;
+    }
+    
+}
 
 struct in_addr get_addr(int key)
 {
+
+    int check = key % M_POW_VAL;
     ring_n* temp;
 
     for(temp = myring; temp != NULL; temp = temp->next)
     {
-        if(key <= temp->value)
+        if(temp->value > check)
         {
             return temp->addr;
         }
@@ -217,4 +248,29 @@ struct in_addr get_addr(int key)
     return myring->addr;
 }
 
+int get_hashed_id()
+{
+    unsigned char hash[20];
+    unsigned char output[4];
+    memset(output,'\0',4);
+    OpenSSL_add_all_algorithms();
+    hash_fuction("SHA1",inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);  // THIS NEEDS MAGIC STUFF
+    output[2] = hash[18];
+    output[3] = hash[19];
+    return (int)(output[0]);
+}
+
+unsigned int hash_function(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed) {
+    unsigned int md_len = -1;
+    const EVP_MD *md = EVP_get_digestbyname(mode);
+    if(NULL != md) {
+        EVP_MD_CTX mdctx;
+        EVP_MD_CTX_init(&mdctx);
+        EVP_DigestInit_ex(&mdctx, md, NULL);
+        EVP_DigestUpdate(&mdctx, dataToHash, dataSize);
+        EVP_DigestFinal_ex(&mdctx, outHashed, &md_len);
+        EVP_MD_CTX_cleanup(&mdctx);
+    }
+    return md_len;
+}
 

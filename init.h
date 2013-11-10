@@ -43,6 +43,7 @@ void set_leave();
 void rejoin();
 
 void add_to_ring(int newid, struct in_addr new_addr);
+void remove_from_ring(int id);
 
 void *grep_recv_thread_main(void *discard);
 void *goss_recv_thread_main(void *discard);
