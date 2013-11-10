@@ -596,14 +596,14 @@ void *gossip_thread_main(void *discard){
     	}
     	else if(leaving_group_flag == 2)
     	{
-	    if(server_flag)
-	    {
-		num_machines = 0;
-	    }
-	    else
-	    {
-		num_machines = 1;
-	    }
+	        if(server_flag)
+	        {
+		        num_machines = 0;
+	        }
+	        else
+	        {
+		        num_machines = 1;
+	        }
             sem_post(&gossip_lock);//end lock
     	    continue;
     	}
@@ -646,8 +646,8 @@ void *monitor_thread_main(void *discard){
 
     while(1)
     {
-    	if(leaving_group_flag != 0){continue;}
         sem_wait(&gossip_lock);//lock
+    	if(leaving_group_flag != 0){continue;}
         tempt = (int)time(NULL);
         for(i = 1; i<=num_machines; i++)
         {
