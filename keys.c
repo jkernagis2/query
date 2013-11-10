@@ -257,6 +257,12 @@ int get_hashed_id()
     the_hash("SHA1",inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);  // THIS NEEDS MAGIC STUFF
     output[2] = hash[18];
     output[3] = hash[19];
+    if(TEST_MODE == 1){
+        unsigned char test[21];
+        strncpy(test,hash,20);
+        test[20] = '\0';
+        printf("Hash string is: %x\n",test);
+    }
     return (int)(output[0]);
 }
 
