@@ -297,6 +297,7 @@ void leave(int index, int type){
 
 
     //file IO saying someone left
+    printf("Id being removed = %d\n", gossip_list[index].ring_id);
     remove_from_ring(gossip_list[index].ring_id);
     if(type == 1){
         //Crashed Machine
@@ -424,6 +425,8 @@ void remove_from_ring(int id){
         {
             (temp->prev)->next = temp->next;
         }
+        printf("Removing = %d\n", temp);
+        printf("Myring = %d\n", myring);
         free(temp);
     }
 }
