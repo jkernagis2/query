@@ -136,74 +136,77 @@ void local_show()
 
 }
 
-void insert(int key, char* val){
+void insert(int key, char* val)
+{
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(9090);
     sendaddr.sin_addr = get_addr(key);
-    
+
 
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
     strncpy(message.command,"insert",6);
     strncpy(message.message,val,strlen(val));
-    
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;  
+
+    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void lookup(int key){
+void lookup(int key)
+{
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(9090);
     sendaddr.sin_addr = get_addr(key);
-    
+
 
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
     strncpy(message.command,"lookup",6);
-    
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
+
+    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void update(int key, char* new_val){
+void update(int key, char* new_val)
+{
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(9090);
     sendaddr.sin_addr = get_addr(key);
-    
+
 
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
     strncpy(message.command,"update",6);
     strncpy(message.message,new_val,strlen(new_val));
-    
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
+
+    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void delete_k(int key){
-
+void delete_k(int key)
+{
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
     sendaddr.sin_port = htons(9090);
     sendaddr.sin_addr = get_addr(key);
-    
+
 
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
     strncpy(message.command,"delete",6);
 
-    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ; 
+    sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-void shift_keys(int new_id){
-    
+void shift_keys(int new_id)
+{
     keyval* temp = mykv;
     keyval* temp_next;
     while(temp != NULL)
@@ -216,10 +219,9 @@ void shift_keys(int new_id){
         }
         temp = temp_next;
     }
-    
 }
-void move_keys(){
-    
+void move_keys()
+{
     keyval* temp = mykv;
     keyval* temp_next;
     while(temp != NULL)
@@ -229,12 +231,10 @@ void move_keys(){
         local_delete(temp->key);
         temp = temp_next;
     }
-    
 }
 
 struct in_addr get_addr(int key)
 {
-
     int check = key % M_POW_VAL;
     ring_n* temp;
 
@@ -251,32 +251,6 @@ struct in_addr get_addr(int key)
 int get_hashed_id()
 {
     unsigned char hash[20];
-    unsigned char output[4];
-    memset(output,'\0',4);
-    OpenSSL_add_all_algorithms();
-    the_hash("SHA1",inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);  // THIS NEEDS MAGIC STUFF
-    output[2] = hash[18];
-    output[3] = hash[19];
-    if(TEST_MODE == 1){
-        unsigned char test[21];
-        strncpy(test,hash,20);
-        test[20] = '\0';
-        printf("Hash string is: %x\n",test);
-    }
-    return (int)(output[0]);
+    SHA1(inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);
+    return (int)(( (int) 0 ) | hash[19]);
 }
-
-unsigned int the_hash(const char *mode, const char* dataToHash, size_t dataSize, unsigned char* outHashed) {
-    unsigned int md_len = -1;
-    const EVP_MD *md = EVP_get_digestbyname(mode);
-    if(NULL != md) {
-        EVP_MD_CTX mdctx;
-        EVP_MD_CTX_init(&mdctx);
-        EVP_DigestInit_ex(&mdctx, md, NULL);
-        EVP_DigestUpdate(&mdctx, dataToHash, dataSize);
-        EVP_DigestFinal_ex(&mdctx, outHashed, &md_len);
-        EVP_MD_CTX_cleanup(&mdctx);
-    }
-    return md_len;
-}
-
