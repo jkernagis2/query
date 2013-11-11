@@ -17,6 +17,8 @@ extern ring_n* myring;
 struct sockaddr_in myaddr;
 struct sockaddr_in mygaddr;
 
+struct sockaddr_in retaddr;
+
 // Membership list and counter variables
 gossip_s* gossip_list;
 volatile int num_machines;
@@ -545,14 +547,30 @@ void *grep_recv_thread_main(void *discard){
                     local_delete(buff.nid);
                 }
                 else if(strncmp(buf,"r_lookup",8) == 0){
-                   printf("Key %d has value: %s\n",buff.nid,buff.message);
+                   sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   //printf("Key %d has value: %s\n",buff.nid,buff.message);
                    sem_post(&test_lock);
                 }else if(strncmp(buf,"dnf_lookup",10) == 0){
-                   printf("Key %d was not found.\n",buff.nid);
+                   sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   //printf("Key %d was not found.\n",buff.nid);
                    sem_post(&test_lock);
                 }else if(strncmp(buf,"i_done",6) == 0){
                    printf("Key insert finished.\n");
                    sem_post(&test_lock);
+                }
+
+
+                /*External Calls*/
+                else if(strncmp(buf,"s_insert",8) == 0){
+                    insert(buff.nid, buff.message);
+                }else if(strncmp(buf,"s_lookup",8) == 0){
+                    lookup(buff.nid);
+                    memset(&retaddr, 0, sizeof(retaddr));
+                    memcpy(&retaddr, &fromaddr, sizeof(struct sockaddr_in));
+                }else if(strncmp(buf,"s_update",8) == 0){
+                    update(buff.nid, buff.message);
+                }else if(strncmp(buf,"s_delete",8) == 0){
+                    delete_k(buff.nid);
                 }
             }
     }
