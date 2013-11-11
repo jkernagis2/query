@@ -1,5 +1,5 @@
 ECE 428
-MP 1 : Distributed GREP
+MP 3 : MY-KV
 Elzabad Kennedy & John Kernagis
 
 Compilation Instructions
@@ -10,53 +10,26 @@ Compilation Instructions
 ---> make
 
 2. Run the program on each computer.
----> ./distrib_grep
+    For one machine, launch with this command to set it as the master node
+    for group joining.
+---> ./distrib_grep 1
+
+    For the other machines, launch as such where <IP> is the IP address reported
+    by the master node.
+
+---> ./distrib_grep 0 <IP>
 
 3. Upon running each instance of the program, you will be asked to enter
-    the addresses of the other machines, as well as the machine ID of the
-    current instance.  Please give each machine a unique ID from 1 to 4.
+    a machineID.  This is used for group membership/gossiping, please enter
+    a a number < 100.
 
-4. You can run a unit test by entering the "/test" command from any machine.
-
-    This will send a command to the other machines to generate logs based on
-    their machine ID.  The current machine will then send grep requests to the
-    other machines.  When the results are received, the current machine compares
-    the results to an internally defined answer file and reports success or failure.
-
-5. Otherwise, you can use the grep command to perform a distributed search of log
-    files stored on all the machines.  Log files should be named based on machine ID:
-        machine.1.log
-        machine.2.log
-        machine.3.log
-        machine.4.log
-
-    See COMMAND USAGE below for an explanation of the available flags.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-COMMAND USAGE
-
-You may do a grep on either the entire log file, line by line as is grep's default,
-  or limit the grep to either the keys or values.  This is accomplished internally
-  via the gawk command.
-
-From the client, just enter a grep command with your requested pattern to do a
-  distributed grep on the log files as a whole.
-
----> grep YOUR_SEARCH_TERM_HERE
-
-Internally we do:
-    system("gawk -F: '$0~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
-
-If you wish to only grep the keys, then add the -k flag to your command:
-
----> grep -k YOUR_SEARCH_TERM_HERE
-
-Internally we do:
-    system("gawk -F: '$1~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
-
-If you wish to only grep the values, then add the -v flag to your command:
-
----> grep -v YOUR_SEARCH_TERM_HERE
-
-Internally we do:
-    system("gawk -F: '$2~/YOUR_SEARCH_TERM_HERE/{print$0}' machine.THIS_MACHINE.log > result.tmp");
+4. Now run from any of the computers the following commands from the shell.
+    These launch local executables that perform the required API commands.
+    They are compiled as part of the make command done previously.
+    <key> is an integer from [0-1000000]
+    <value> is a string.
+    
+---> ./insert <key> <value>
+---> ./update <key> <value>
+---> ./delete <key>
+---> ./lookup <key>
