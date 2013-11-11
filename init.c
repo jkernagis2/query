@@ -333,7 +333,7 @@ void set_leave(){
     sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
     /*Ring Management*/
-    remove_from_ring(my_id);
+    remove_from_ring(gossiplist[0].ring_id);
     move_keys();
     
     sem_post(&gossip_lock);//endlock
