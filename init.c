@@ -547,11 +547,11 @@ void *grep_recv_thread_main(void *discard){
                     local_delete(buff.nid);
                 }
                 else if(strncmp(buf,"r_lookup",8) == 0){
-                   sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
                    //printf("Key %d has value: %s\n",buff.nid,buff.message);
                    sem_post(&test_lock);
                 }else if(strncmp(buf,"dnf_lookup",10) == 0){
-                   sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
                    //printf("Key %d was not found.\n",buff.nid);
                    sem_post(&test_lock);
                 }else if(strncmp(buf,"i_done",6) == 0){
