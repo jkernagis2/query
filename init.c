@@ -351,6 +351,15 @@ void rejoin(){
 	    gossip_list[0].p_crashed = 0;
 	    gossip_list[0].has_left = 0;
 	    leaving_group_flag = 0;
+        if(server_flag == 0)
+        {
+            gossip_list[1].counter = 0;
+            gossip_list[1].time = (int)time(NULL);
+            sprintf(gossip_list[1].id,"%d-%d",my_id,(int)time(NULL));
+            gossip_list[1].p_crashed = 0;
+            gossip_list[1].has_left = 0;
+            num_machines = 1;
+        }
     sem_post(&gossip_lock);//endlock
 	return;
 }
@@ -410,6 +419,10 @@ void remove_from_ring(int id){
     {
         if(temp->value == id)
         {
+            if(temp == myring)
+            {
+                myring = temp->next;
+            }
            break;
         }
         temp = temp->next;
@@ -587,7 +600,7 @@ void *goss_recv_thread_main(void *discard){
     gossip_m_s buff;
     char rbuff[1024];
     for (;;) {
-        if(leaving_group_flag != 0){continue;}
+
         int source;
         len = sizeof(fromaddr);
         nbytes = recvfrom(gossfd,&buff,sizeof(gossip_m_s),0,(struct sockaddr *)&fromaddr,&len);
@@ -601,6 +614,7 @@ void *goss_recv_thread_main(void *discard){
 
         if(nbytes == 0){}
         else{
+            if(leaving_group_flag != 0){continue;}
             temp = inet_ntoa(fromaddr.sin_addr);    // return the IP
             //printf("<%s>:Sent Gossip\n", temp);         // Prints incoming message
 
@@ -722,7 +736,7 @@ void *monitor_thread_main(void *discard){
     while(1)
     {
         sem_wait(&gossip_lock);//lock
-    	if(leaving_group_flag != 0){continue;}
+    	if(leaving_group_flag != 0){sem_post(&gossip_lock); continue;}
         tempt = (int)time(NULL);
         for(i = 1; i<=num_machines; i++)
         {
