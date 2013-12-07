@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "keys.h"
-
+#define NUMTEST  20
 volatile int lookup_requests = 0;
 
 void local_insert(int key, char* value)
@@ -282,7 +282,7 @@ void test_lookup(){
     int random;
     FILE* fp = fopen("test_lookup.csv","w");
     Timer timer;
-    for(i = 0; i < 1000; i++){
+    for(i = 0; i < NUMTEST; i++){
         random = rand() % 1000001;
         sem_wait(&test_lock);
         startTime(&timer);
@@ -299,7 +299,7 @@ void test_insert(){
     int random;
     FILE* fp = fopen("test_insert.csv","w");
     Timer timer;
-    for(i = 0; i < 1000; i++){
+    for(i = 0; i < NUMTEST; i++){
         random = rand() % 1000001;
         char buf[20];
         memset(buf,'\0',20);

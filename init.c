@@ -56,6 +56,8 @@ pthread_t monitor_thread;
 
 // Static file name array used in MP1
 char lf[11] = "resulti.tmp";
+void delete_ring();
+void init_ring();
 
 void init(int type, char * servIP){
     int i,n;
@@ -152,11 +154,7 @@ void init(int type, char * servIP){
     }
 
     /*Ring Initialization*/
-    myring = malloc(sizeof(ring_n));
-    myring->value = gossip_list[0].ring_id;
-    myring->next = NULL;
-    myring->prev = NULL;
-    myring->addr.s_addr = myaddr.sin_addr.s_addr;
+    init_ring();
 
 
 }
@@ -335,6 +333,7 @@ void set_leave(){
     /*Ring Management*/
     remove_from_ring(gossip_list[0].ring_id);
     move_keys();
+    delete_ring();
     
     sem_post(&gossip_lock);//endlock
 	// Clear local membership list from [2] to [END]
@@ -345,6 +344,8 @@ void set_leave(){
 void rejoin(){
 	// Generate new ID and stuff
     sem_wait(&gossip_lock);//lock
+        init_ring();
+
 	    gossip_list[0].counter = 0;
 	    gossip_list[0].time = (int)time(NULL);
 	    sprintf(gossip_list[0].id,"%d-%d",my_id,(int)time(NULL));
@@ -363,7 +364,15 @@ void rejoin(){
     sem_post(&gossip_lock);//endlock
 	return;
 }
+void init_ring()
+{
+    myring = malloc(sizeof(ring_n));
+    myring->value = gossip_list[0].ring_id;
+    myring->next = NULL;
+    myring->prev = NULL;
+    myring->addr.s_addr = myaddr.sin_addr.s_addr;
 
+}
 void add_to_ring(int newid, struct in_addr new_addr){
 
     ring_n* n_node;
@@ -438,6 +447,17 @@ void remove_from_ring(int id){
         }
         free(temp);
     }
+}
+void delete_ring(){
+    ring_n* temp = myring;
+    ring_n* temp_next;
+    while(temp != NULL)
+    {
+        temp_next = temp->next;
+        free(temp);
+        temp = temp_next;
+    }
+    myring = NULL;
 }
 
 void *grep_recv_thread_main(void *discard){
