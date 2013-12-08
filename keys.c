@@ -336,6 +336,86 @@ void fix_keys()
         temp = temp_next;
     }
 }
+void leave_shift(ring_n* ring_pos){
+	struct sockaddr_in sendaddr;
+    memset(&sendaddr, '\0', sizeof(sendaddr));
+    sendaddr.sin_family = AF_INET;
+    sendaddr.sin_port = htons(9090);
+
+	mess_s message;
+	memset(&message,'\0',sizeof(message));
+	strncpy(message.command,"replicate",9);
+	
+	struct in_addr address[3];
+	ring_n*  next_p;
+	while(mykv != NULL)
+	{
+		message.nid = mykv->key;
+		strncpy(message.message,mykv->value,strlen(mykv->value));
+		get_rep_addr(mykv->key, address);
+		if(address[0].s_addr == ring_pos->addr.s_addr){
+			next_p = gnn(gnn(gnn(ring_pos)));
+		}
+		else if(address[1].s_addr == ring_pos->addr.s_addr)
+		{
+			next_p = gnn(gnn(ring_pos));
+
+		}
+		else if(address[2].s_addr == ring_pos->addr.s_addr)
+		{
+			next_p = gnn(ring_pos);
+		}
+		else{ 
+			printf("WTF-Leave Shift in keys\n"); 
+			while(1){}
+		}
+		sendaddr.sin_addr = next_p->addr;
+		sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+		local_delete(mykv->key, 0);
+		
+	}
+}
+void crash_shift(ring_n* ring_pos, int pn){
+
+	struct sockaddr_in sendaddr;
+    memset(&sendaddr, '\0', sizeof(sendaddr));
+    sendaddr.sin_family = AF_INET;
+    sendaddr.sin_port = htons(9090);
+
+	mess_s message;
+	memset(&message,'\0',sizeof(message));
+	strncpy(message.command,"replicate",9);
+	
+	struct in_addr address[3];
+	keyval* temp = mykv;
+	ring_n*  next_p;
+
+	while(temp != NULL)
+	{
+		message.nid = temp->key;
+		strncpy(message.message,temp->value,strlen(temp->value));
+		get_rep_addr(temp->key, address);
+		if(address[0].s_addr == ring_pos->addr.s_addr && pn  == 1){
+			next_p = gnn(gnn(gnn(ring_pos)));
+		}
+		else if(address[1].s_addr == ring_pos->addr.s_addr && pn == 0)
+		{
+			next_p = gnn(gnn(ring_pos));
+
+		}
+		else if(address[2].s_addr == ring_pos->addr.s_addr && pn == 0)
+		{
+			next_p = gnn(ring_pos);
+		}
+		else{ 
+			printf("WTF-Crash Shift in keys\n"); 
+			while(1){}
+		}
+		sendaddr.sin_addr = next_p->addr;
+		sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+		temp = temp->next;
+	}
+}
 
 struct in_addr get_addr(int key)
 {
@@ -456,4 +536,29 @@ void dump_keys()
         current = current->next;
     }
     fclose(fp);
+}
+ring_n* gnn(ring_n* current)
+{
+	if(current->next != NULL)
+	{
+		return current->next;
+	}
+	return myring;
+}
+ring_n* gpn(ring_n* current){
+	if(current->prev != NULL)
+	{
+		return current->prev;
+	}
+	return get_last();
+}
+ring_n* get_last(){
+	ring_n* temp = myring;
+	ring_n* last = NULL;
+	while(temp != NULL)
+	{
+		last = temp;
+		temp = temp->next;
+	}
+	return last;
 }

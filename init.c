@@ -302,7 +302,7 @@ void leave(int index, int type){
 
 
     //file IO saying someone left
-    remove_from_ring(gossip_list[index].ring_id);
+    remove_from_ring(gossip_list[index].ring_id, 0);
     if(type == 1){
         //Crashed Machine
         if((index != 1) || (server_flag == 1)){
@@ -335,8 +335,7 @@ void set_leave(){
     sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
     /*Ring Management*/
-    remove_from_ring(gossip_list[0].ring_id);
-    move_keys();
+    remove_from_ring(gossip_list[0].ring_id, 0);
     delete_ring();
     
     sem_post(&gossip_lock);//endlock
@@ -425,11 +424,15 @@ void add_to_ring(int newid, struct in_addr new_addr){
     }
 
 }
-void remove_from_ring(int id){
+void remove_from_ring(int id, int type){
     
     ring_n* temp = myring;
+	ring_n* prev;
+	ring_n* next;
     while(temp != NULL)
     {
+		prev = temp->prev;
+		next = temp->next;
         if(temp->value == id)
         {
             if(temp == myring)
@@ -441,6 +444,21 @@ void remove_from_ring(int id){
         temp = temp->next;
     }
     if(temp != NULL){
+	
+		if(id = gossip_list[0].ring_id)
+		{
+			leave_shift(temp);
+		}
+		else if(type == 1){
+			if(gossip_list[0].ring_id == gpn(temp)->value)
+			{
+				crash_shift(temp, 0);
+			}
+			else if(gossip_list[0].ring_id  == gnn(temp)->value){
+				crash_shift(temp, 1);
+			}
+		}
+		
         if(temp->next !=NULL)
         {
             (temp->next)->prev = temp->prev;

@@ -45,6 +45,12 @@ void shift_keys();
 void move_keys();
 void fix_keys();
 
+ring_n* gnn(ring_n* ring_pos);
+ring_n* gpn(ring_n* current);
+ring_n* get_last();
+
+void leave_shift(ring_n* ring_pos);
+void crash_shift(ring_n* ring_pos, int pn);
 struct in_addr get_addr(int key);
 void get_rep_addr(int key, struct in_addr* input);
 int get_hashed_id();
