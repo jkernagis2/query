@@ -261,7 +261,8 @@ void multicast(const char *message){
 void join(gossip_s* new_gossip){
     printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
-    shift_keys();
+    //shift_keys();
+	fix_keys();
     if((new_gossip->addr.s_addr == gossip_list[1].addr.s_addr) && (server_flag == 0))
     {
         gossip_list[1].addr = new_gossip->addr;
