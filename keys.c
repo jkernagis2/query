@@ -9,7 +9,7 @@
 #define NUMTEST  20
 volatile int lookup_requests = 0;
 
-void local_insert(int key, char* value)
+void local_insert(int key, char* value, int type)
 {
     // Allocate new keyval structure and linked list traversing pointers
     keyval* new_key = malloc(sizeof(keyval));
@@ -61,6 +61,27 @@ void local_insert(int key, char* value)
         }
         if(mykv == new_key->next){
             mykv = new_key;
+        }
+    }
+    /*MP4*/
+    if(type == 1){
+        int i;
+        struct sockaddr_in sendaddr;
+        memset(&sendaddr, '\0', sizeof(sendaddr));
+        sendaddr.sin_family = AF_INET;
+        sendaddr.sin_port = htons(9090);
+
+
+        mess_s message;
+        memset(&message,'\0',sizeof(message));
+        message.nid = key;
+        strncpy(message.command,"replicate",9);
+        strncpy(message.message,value,strlen(value));
+        struct in_addr address[3];
+        get_rep_addr(key, address);
+        for(i = 0; i < 2; i++){
+            sendaddr.sin_addr = address[i+1];
+            sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
         }
     }
 }
@@ -255,6 +276,44 @@ struct in_addr get_addr(int key)
         }
     }
     return myring->addr;
+}
+
+void get_rep_addr(int key, struct in_addr* input)
+{
+    int check = key % M_POW_VAL;
+    ring_n* temp;
+
+    for(temp = myring; temp != NULL; temp = temp->next)
+    {
+        if(temp->value > check)
+        {
+            input[0] = temp->addr;
+            break;
+        }
+    }
+
+    if(temp == NULL){
+        temp = myring;
+        input[0] = myring->addr;
+    }
+    
+    if(temp->next != NULL){
+        input[1] = temp->next->addr;
+        temp = temp->next;
+    }
+    else{
+        temp = myring;
+        input[1] = myring->addr;
+    }
+
+    if(temp->next != NULL){
+        input[2] = temp->next->addr;
+    }
+    else{
+        input[2] = myring->addr;
+    }
+
+    return;
 }
 
 int get_hashed_id()

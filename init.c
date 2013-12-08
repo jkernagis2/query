@@ -59,6 +59,8 @@ char lf[11] = "resulti.tmp";
 void delete_ring();
 void init_ring();
 
+int replicas;
+
 void init(int type, char * servIP){
     int i,n;
     int sockoptval = 1;
@@ -155,7 +157,7 @@ void init(int type, char * servIP){
 
     /*Ring Initialization*/
     init_ring();
-
+    replicas = 0;
 
 }
 void getIP(){
@@ -550,13 +552,23 @@ void *grep_recv_thread_main(void *discard){
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"insert",6) == 0){
-                    local_insert(buff.nid, buff.message);
+                    local_insert(buff.nid, buff.message,1);
                     mess_s ret;
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
                     ret.nid = buff.nid;
                     strcpy(ret.command, "i_done");
 
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                }
+                else if(strncmp(buf,"replicate",9) == 0){
+                    local_insert(buff.nid, buff.message,0);
+                    replicas++;
+                    /*mess_s ret;
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    ret.nid = buff.nid;
+                    strcpy(ret.command, "i_done");
+
+                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));*/
                 }
                 else if(strncmp(buf,"lookup",6) == 0){
                     mess_s ret;

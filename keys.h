@@ -23,7 +23,7 @@ extern struct sockaddr_in myaddr;
 extern int grepfd;
 extern sem_t test_lock;
 
-void local_insert(int key, char* val);
+void local_insert(int key, char* val, int type);
 
 char* local_lookup(int key);
 
@@ -45,6 +45,7 @@ void shift_keys();
 void move_keys();
 
 struct in_addr get_addr(int key);
+void get_rep_addr(int key, struct in_addr* input);
 int get_hashed_id();
 
 void startTime(Timer* timer);
