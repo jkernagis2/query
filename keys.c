@@ -43,6 +43,26 @@ void local_insert(int key, char* value, int type)
         if(current != NULL){
             if(current->key == key){
                 free(new_key);
+				if(type == 1){
+					int i;
+					struct sockaddr_in sendaddr;
+					memset(&sendaddr, '\0', sizeof(sendaddr));
+					sendaddr.sin_family = AF_INET;
+					sendaddr.sin_port = htons(9090);
+
+
+					mess_s message;
+					memset(&message,'\0',sizeof(message));
+					message.nid = key;
+					strncpy(message.command,"replicate",9);
+					strncpy(message.message,value,strlen(value));
+					struct in_addr address[3];
+					get_rep_addr(key, address);
+					for(i = 0; i < 2; i++){
+						sendaddr.sin_addr = address[i+1];
+						sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+					}
+				}
                 return;
             }
         }
