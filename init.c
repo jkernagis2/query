@@ -298,7 +298,7 @@ void join(gossip_s* new_gossip){
 void leave(int index, int type){
 
     //file IO saying someone left
-    remove_from_ring(gossip_list[index].ring_id, 0);
+    remove_from_ring(gossip_list[index].ring_id, 1);
     if(type == 1){
         //Crashed Machine
         if((index != 1) || (server_flag == 1)){

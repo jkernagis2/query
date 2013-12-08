@@ -42,26 +42,22 @@ typedef struct{
     int32_t ring_id;
     
 } gossip_s;
-
 typedef struct {
     int32_t num_gossip;
     gossip_s gossips[10];
 }gossip_m_s;
-
 typedef struct ring_n{
     struct in_addr addr; //address
     int value;
     struct ring_n* next;
     struct ring_n* prev;
 }ring_n;
-
 typedef struct keyval{
     int key;
     char* value;
     struct keyval* next;
     struct keyval* prev;
 }keyval;
-
 typedef struct {
     struct timeval startTime;
     struct timeval endTime;

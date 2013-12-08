@@ -104,7 +104,6 @@ void local_insert(int key, char* value, int type){
         }
     }
 }
-
 char* local_lookup(int key){
     keyval* current = mykv;
     lookup_requests++;
@@ -118,7 +117,6 @@ char* local_lookup(int key){
     }
     return NULL;
 }
-
 void local_update(int key, char* new_val, int type){
     keyval* current = mykv;
     while(current != NULL){
@@ -154,7 +152,6 @@ void local_update(int key, char* new_val, int type){
     }
     return;
 }
-
 void local_delete(int key, int type){
     keyval* current = mykv;
     keyval* temp = NULL;
@@ -198,7 +195,6 @@ void local_delete(int key, int type){
     }
     return;
 }
-
 void local_show(){
     keyval* current = mykv;
     int counter = 0;
@@ -219,7 +215,6 @@ void local_show(){
     printf("\nLookup Requests Recieved: %d\n",lookup_requests);
 
 }
-
 void insert(int key, char* val){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
@@ -236,7 +231,6 @@ void insert(int key, char* val){
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-
 void lookup(int key){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
@@ -252,7 +246,6 @@ void lookup(int key){
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-
 void update(int key, char* new_val){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
@@ -269,7 +262,6 @@ void update(int key, char* new_val){
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-
 void delete_k(int key){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
@@ -404,7 +396,6 @@ void crash_shift(ring_n* ring_pos, int pn){
 		temp = temp->next;
 	}
 }
-
 struct in_addr get_addr(int key){
     int check = key % M_POW_VAL;
     ring_n* temp;
@@ -418,7 +409,6 @@ struct in_addr get_addr(int key){
     }
     return myring->addr;
 }
-
 void get_rep_addr(int key, struct in_addr* input){
     int check = key % M_POW_VAL;
     ring_n* temp;
@@ -455,26 +445,21 @@ void get_rep_addr(int key, struct in_addr* input){
 
     return;
 }
-
 int get_hashed_id(){
     unsigned char hash[20];
     SHA1(inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);
     return (int)(( (int) 0 ) | hash[19]);
 }
-
 void startTime(Timer* timer) {
     gettimeofday(&(timer->startTime), NULL);
 }
-
 void stopTime(Timer* timer) {
     gettimeofday(&(timer->endTime), NULL);
 }
-
 float elapsedTime(Timer timer) {
     return ((float) ((timer.endTime.tv_sec - timer.startTime.tv_sec) \
                 + (timer.endTime.tv_usec - timer.startTime.tv_usec)/1.0e6));
 }
-
 void test_lookup(){
     int i;
     int random;
@@ -491,7 +476,6 @@ void test_lookup(){
     }
     fclose(fp);
 }
-
 void test_insert(){
     int i;
     int random;
@@ -511,7 +495,6 @@ void test_insert(){
     }
     fclose(fp);
 }
-
 void dump_keys(){
     FILE* fp = fopen("keys.dmp","w");
     keyval* current = mykv;
