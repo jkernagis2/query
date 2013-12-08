@@ -438,7 +438,7 @@ void remove_from_ring(int id, int type){
     }
     if(temp != NULL){
 	
-		if(id = gossip_list[0].ring_id)
+		if(id = gossip_list[0].ring_id && type == 0)
 		{
 			leave_shift(temp);
 		}
