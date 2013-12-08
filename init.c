@@ -487,6 +487,7 @@ void *grep_recv_thread_main(void *discard){
 
         if(nbytes == 0){}
             else{
+			    if(leaving_group_flag != 0){continue;}
                 temp = inet_ntoa(fromaddr.sin_addr);    // return the IP
                 printf("<%s> %s\n", temp,buf);          // Prints incoming message
                 if(strncmp(buf,"/test",5) == 0){        // Check if we are doing a test
