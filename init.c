@@ -446,9 +446,11 @@ void remove_from_ring(int id, int type){
 		else if(type == 1){
 			if(gossip_list[0].ring_id == gpn(temp)->value)
 			{
+                printf("Prev Shift");
 				crash_shift(temp, 0);
 			}
 			else if(gossip_list[0].ring_id  == gnn(temp)->value){
+                printf("Next Shift");
 				crash_shift(temp, 1);
 			}
 		}
