@@ -313,7 +313,7 @@ void leave(int index, int type){
         }
     }
     else{
-        remove_from_ring(gossip_list[index].ring_id, 0);
+        remove_from_ring(gossip_list[index].ring_id, 2);
     	if((index != 1) || (server_flag == 1)){
             /*Erase the addrs in the list and shifts that array down*/
             memmove(&gossip_list[index], &gossip_list[index+1], sizeof(gossip_s)*(num_machines-index));
