@@ -327,6 +327,7 @@ void leave(int index, int type){
             log_event(my_id,num_machines,"hostleave",gossip_list);
         }
     }
+	fix_keys();
 }
 
 void set_leave(){

@@ -43,6 +43,7 @@ void delete_k(int key);
 
 void shift_keys();
 void move_keys();
+void fix_keys();
 
 struct in_addr get_addr(int key);
 void get_rep_addr(int key, struct in_addr* input);

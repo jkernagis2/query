@@ -293,11 +293,26 @@ void move_keys()
 {
     keyval* temp = mykv;
     keyval* temp_next;
+	mykv == NULL;
     while(temp != NULL)
     {
         temp_next = temp->next;
         insert(temp->key, temp->value);
         local_delete(temp->key, 0);
+        temp = temp_next;
+    }
+}
+void fix_keys()
+{
+	keyval* temp = mykv;
+    keyval* temp_next;
+	mykv = NULL;
+    while(temp != NULL)
+    {
+        temp_next = temp->next;
+        insert(temp->key, temp->value);
+		free(temp->value);
+		free(temp);
         temp = temp_next;
     }
 }
