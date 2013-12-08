@@ -387,7 +387,8 @@ void crash_shift(ring_n* ring_pos, int pn){
 		{
 			next_p = gnn(ring_pos);
 		}
-		else{ 
+		else{
+            temp = temp->next; 
 			continue;
         }
 		sendaddr.sin_addr = next_p->addr;
