@@ -101,7 +101,7 @@ char* local_lookup(int key)
     return NULL;
 }
 
-void local_update(int key, char* new_val)
+void local_update(int key, char* new_val, int type)
 {
     keyval* current = mykv;
     while(current != NULL){
@@ -109,6 +109,26 @@ void local_update(int key, char* new_val)
             free(current->value);
             current->value = malloc(strlen(new_val));
             strcpy(current->value,new_val);
+			if(type == 1){
+				int i;
+				struct sockaddr_in sendaddr;
+				memset(&sendaddr, '\0', sizeof(sendaddr));
+				sendaddr.sin_family = AF_INET;
+				sendaddr.sin_port = htons(9090);
+
+
+				mess_s message;
+				memset(&message,'\0',sizeof(message));
+				message.nid = key;
+				strncpy(message.command,"rep_update",9);
+				strncpy(message.message,new_val,strlen(new_val));
+				struct in_addr address[3];
+				get_rep_addr(key, address);
+				for(i = 0; i < 2; i++){
+					sendaddr.sin_addr = address[i+1];
+					sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+				}
+			}
             return;
         }
         else{

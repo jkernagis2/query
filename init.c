@@ -586,8 +586,11 @@ void *grep_recv_thread_main(void *discard){
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"update",6) == 0){
-                    local_update(buff.nid, buff.message);
+                    local_update(buff.nid, buff.message,1);
                 }
+				else if(strncmp(buf,"rep_update",10) == 0){
+                    local_update(buff.nid, buff.message,0);
+				}
                 else if(strncmp(buf,"delete",6) == 0){
                     local_delete(buff.nid, 1);
                 }
