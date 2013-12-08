@@ -388,9 +388,8 @@ void crash_shift(ring_n* ring_pos, int pn){
 			next_p = gnn(ring_pos);
 		}
 		else{ 
-			printf("WTF-Crash Shift in keys\n"); 
-			while(1){}
-		}
+			continue;
+        }
 		sendaddr.sin_addr = next_p->addr;
 		sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
 		temp = temp->next;
