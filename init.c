@@ -589,10 +589,10 @@ void *grep_recv_thread_main(void *discard){
                     local_update(buff.nid, buff.message);
                 }
                 else if(strncmp(buf,"delete",6) == 0){
-                    local_delete(buff.nid, 0);
+                    local_delete(buff.nid, 1);
                 }
 				else if(strncmp(buf,"rep_delete",10) == 0){
-                    local_delete(buff.nid, 1);
+                    local_delete(buff.nid, 0);
 					replicas--;
                 }
                 else if(strncmp(buf,"r_lookup",8) == 0){
