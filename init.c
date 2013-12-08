@@ -589,7 +589,11 @@ void *grep_recv_thread_main(void *discard){
                     local_update(buff.nid, buff.message);
                 }
                 else if(strncmp(buf,"delete",6) == 0){
-                    local_delete(buff.nid);
+                    local_delete(buff.nid, 0);
+                }
+				else if(strncmp(buf,"rep_delete",10) == 0){
+                    local_delete(buff.nid, 1);
+					replicas--;
                 }
                 else if(strncmp(buf,"r_lookup",8) == 0){
                    //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));

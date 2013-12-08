@@ -118,7 +118,7 @@ void local_update(int key, char* new_val)
     return;
 }
 
-void local_delete(int key)
+void local_delete(int key, int type)
 {
     keyval* current = mykv;
     keyval* temp = NULL;
@@ -139,6 +139,25 @@ void local_delete(int key)
         }
         else{
             current = current->next;
+        }
+    }
+	if(type == 1){
+        int i;
+        struct sockaddr_in sendaddr;
+        memset(&sendaddr, '\0', sizeof(sendaddr));
+        sendaddr.sin_family = AF_INET;
+        sendaddr.sin_port = htons(9090);
+
+
+        mess_s message;
+        memset(&message,'\0',sizeof(message));
+        message.nid = key;
+        strncpy(message.command,"rep_delete",10);
+        struct in_addr address[3];
+        get_rep_addr(key, address);
+        for(i = 0; i < 2; i++){
+            sendaddr.sin_addr = address[i+1];
+            sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
         }
     }
     return;
@@ -245,7 +264,7 @@ void shift_keys(int new_id)
         if(get_addr(temp->key).s_addr != myaddr.sin_addr.s_addr)
         {
             insert(temp->key, temp->value);
-            local_delete(temp->key);
+            local_delete(temp->key, 0);
         }
         temp = temp_next;
     }
@@ -258,7 +277,7 @@ void move_keys()
     {
         temp_next = temp->next;
         insert(temp->key, temp->value);
-        local_delete(temp->key);
+        local_delete(temp->key, 0);
         temp = temp_next;
     }
 }

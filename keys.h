@@ -29,7 +29,7 @@ char* local_lookup(int key);
 
 void local_update(int key, char* new_val);
 
-void local_delete(int key);
+void local_delete(int key, int type);
 
 void local_show();
 
