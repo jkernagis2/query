@@ -135,29 +135,29 @@ void local_delete(int key, int type)
             }
             free(current->value);
             free(current);
+			if(type == 1){
+				int i;
+				struct sockaddr_in sendaddr;
+				memset(&sendaddr, '\0', sizeof(sendaddr));
+				sendaddr.sin_family = AF_INET;
+				sendaddr.sin_port = htons(9090);
+
+
+				mess_s message;
+				memset(&message,'\0',sizeof(message));
+				message.nid = key;
+				strncpy(message.command,"rep_delete",10);
+				struct in_addr address[3];
+				get_rep_addr(key, address);
+				for(i = 0; i < 2; i++){
+					sendaddr.sin_addr = address[i+1];
+					sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+				}
+			}
             return;
         }
         else{
             current = current->next;
-        }
-    }
-	if(type == 1){
-        int i;
-        struct sockaddr_in sendaddr;
-        memset(&sendaddr, '\0', sizeof(sendaddr));
-        sendaddr.sin_family = AF_INET;
-        sendaddr.sin_port = htons(9090);
-
-
-        mess_s message;
-        memset(&message,'\0',sizeof(message));
-        message.nid = key;
-        strncpy(message.command,"rep_delete",10);
-        struct in_addr address[3];
-        get_rep_addr(key, address);
-        for(i = 0; i < 2; i++){
-            sendaddr.sin_addr = address[i+1];
-            sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
         }
     }
     return;
