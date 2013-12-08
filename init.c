@@ -260,7 +260,7 @@ void join(gossip_s* new_gossip){
     printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
     //shift_keys();
-	fix_keys();
+	//fix_keys();
     if((new_gossip->addr.s_addr == gossip_list[1].addr.s_addr) && (server_flag == 0))
     {
         gossip_list[1].addr = new_gossip->addr;
@@ -403,7 +403,20 @@ void add_to_ring(int newid, struct in_addr new_addr){
     if(myring == n_node->next){
         myring = n_node;
     }
-    if(n_node->next !=NULL)
+
+    if(gossip_list[0].ring_id == gnn(n_node)->value){
+        shift_keys(n_node, 0);
+    }
+    else if(gossip_list[0].ring_id == gnn(gnn(n_node))->value){
+        shift_keys(n_node, 1);
+    }
+    else if(gossip_list[0].ring_id == gnn(gnn(gnn(n_node)))->value){
+        shift_keys(n_node, 2);
+    }
+
+
+
+    /*if(n_node->next !=NULL)
     {
         if(my_id == (n_node->next)->value)
         {
@@ -415,7 +428,7 @@ void add_to_ring(int newid, struct in_addr new_addr){
         {
             shift_keys();
         }
-    }
+    }*/
 
 }
 void remove_from_ring(int id, int type){

@@ -41,7 +41,7 @@ void update(int key, char* new_val);
 
 void delete_k(int key);
 
-void shift_keys();
+void shift_keys(ring_n* ring_pos, int pn);
 void move_keys();
 void fix_keys();
 
