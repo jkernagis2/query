@@ -405,12 +405,15 @@ void add_to_ring(int newid, struct in_addr new_addr){
     }
 
     if(gossip_list[0].ring_id == gnn(n_node)->value){
+        printf("Shift Next 1");
         shift_keys(n_node, 0);
     }
     else if(gossip_list[0].ring_id == gnn(gnn(n_node))->value){
+        printf("Shift Next 2");
         shift_keys(n_node, 1);
     }
     else if(gossip_list[0].ring_id == gnn(gnn(gnn(n_node)))->value){
+        printf("Shift Next 3");
         shift_keys(n_node, 2);
     }
 
