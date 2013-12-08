@@ -185,7 +185,6 @@ void getIP(){
 		}
 	}
 }
-
 void multicast(const char *message){
 
     int i;
@@ -257,7 +256,6 @@ void multicast(const char *message){
         else{printf("Test failure.\n");}
     }
 }
-
 void join(gossip_s* new_gossip){
     printf("New Machine\n");
     add_to_ring(new_gossip->ring_id, new_gossip->addr);
@@ -299,8 +297,6 @@ void join(gossip_s* new_gossip){
 }
 void leave(int index, int type){
 
-
-
     //file IO saying someone left
     remove_from_ring(gossip_list[index].ring_id, 0);
     if(type == 1){
@@ -328,9 +324,7 @@ void leave(int index, int type){
             log_event(my_id,num_machines,"hostleave",gossip_list);
         }
     }
-	fix_keys();
 }
-
 void set_leave(){
     sem_wait(&gossip_lock);//lock
 	leaving_group_flag = 1;
@@ -367,8 +361,7 @@ void rejoin(){
     sem_post(&gossip_lock);//endlock
 	return;
 }
-void init_ring()
-{
+void init_ring(){
     myring = malloc(sizeof(ring_n));
     myring->value = gossip_list[0].ring_id;
     myring->next = NULL;
@@ -481,7 +474,6 @@ void delete_ring(){
     }
     myring = NULL;
 }
-
 void *grep_recv_thread_main(void *discard){
     struct sockaddr_in fromaddr;
     socklen_t len;
@@ -836,3 +828,9 @@ void *monitor_thread_main(void *discard){
 
 
 }
+
+
+
+
+
+

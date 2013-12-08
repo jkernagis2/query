@@ -9,8 +9,7 @@
 #define NUMTEST  20
 volatile int lookup_requests = 0;
 
-void local_insert(int key, char* value, int type)
-{
+void local_insert(int key, char* value, int type){
     // Allocate new keyval structure and linked list traversing pointers
     keyval* new_key = malloc(sizeof(keyval));
     keyval* current = mykv;
@@ -106,8 +105,7 @@ void local_insert(int key, char* value, int type)
     }
 }
 
-char* local_lookup(int key)
-{
+char* local_lookup(int key){
     keyval* current = mykv;
     lookup_requests++;
     while(current != NULL){
@@ -121,8 +119,7 @@ char* local_lookup(int key)
     return NULL;
 }
 
-void local_update(int key, char* new_val, int type)
-{
+void local_update(int key, char* new_val, int type){
     keyval* current = mykv;
     while(current != NULL){
         if(current->key == key){
@@ -158,8 +155,7 @@ void local_update(int key, char* new_val, int type)
     return;
 }
 
-void local_delete(int key, int type)
-{
+void local_delete(int key, int type){
     keyval* current = mykv;
     keyval* temp = NULL;
     while(current != NULL){
@@ -203,8 +199,7 @@ void local_delete(int key, int type)
     return;
 }
 
-void local_show()
-{
+void local_show(){
     keyval* current = mykv;
     int counter = 0;
     // Print local keys stored here
@@ -225,8 +220,7 @@ void local_show()
 
 }
 
-void insert(int key, char* val)
-{
+void insert(int key, char* val){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -243,8 +237,7 @@ void insert(int key, char* val)
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void lookup(int key)
-{
+void lookup(int key){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -260,8 +253,7 @@ void lookup(int key)
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void update(int key, char* new_val)
-{
+void update(int key, char* new_val){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -278,8 +270,7 @@ void update(int key, char* new_val)
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
 
-void delete_k(int key)
-{
+void delete_k(int key){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -294,8 +285,7 @@ void delete_k(int key)
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-void shift_keys(int new_id)
-{
+void shift_keys(int new_id){
     keyval* temp = mykv;
     keyval* temp_next;
     while(temp != NULL)
@@ -309,8 +299,7 @@ void shift_keys(int new_id)
         temp = temp_next;
     }
 }
-void move_keys()
-{
+void move_keys(){
     keyval* temp = mykv;
     keyval* temp_next;
 	mykv == NULL;
@@ -322,8 +311,7 @@ void move_keys()
         temp = temp_next;
     }
 }
-void fix_keys()
-{
+void fix_keys(){
 	keyval* temp = mykv;
     keyval* temp_next;
 	mykv = NULL;
@@ -417,8 +405,7 @@ void crash_shift(ring_n* ring_pos, int pn){
 	}
 }
 
-struct in_addr get_addr(int key)
-{
+struct in_addr get_addr(int key){
     int check = key % M_POW_VAL;
     ring_n* temp;
 
@@ -432,8 +419,7 @@ struct in_addr get_addr(int key)
     return myring->addr;
 }
 
-void get_rep_addr(int key, struct in_addr* input)
-{
+void get_rep_addr(int key, struct in_addr* input){
     int check = key % M_POW_VAL;
     ring_n* temp;
 
@@ -470,8 +456,7 @@ void get_rep_addr(int key, struct in_addr* input)
     return;
 }
 
-int get_hashed_id()
-{
+int get_hashed_id(){
     unsigned char hash[20];
     SHA1(inet_ntoa(myaddr.sin_addr),strlen(inet_ntoa(myaddr.sin_addr)),hash);
     return (int)(( (int) 0 ) | hash[19]);
@@ -527,8 +512,7 @@ void test_insert(){
     fclose(fp);
 }
 
-void dump_keys()
-{
+void dump_keys(){
     FILE* fp = fopen("keys.dmp","w");
     keyval* current = mykv;
     while(current != NULL){
@@ -537,8 +521,7 @@ void dump_keys()
     }
     fclose(fp);
 }
-ring_n* gnn(ring_n* current)
-{
+ring_n* gnn(ring_n* current){
 	if(current->next != NULL)
 	{
 		return current->next;
@@ -562,3 +545,6 @@ ring_n* get_last(){
 	}
 	return last;
 }
+
+
+
