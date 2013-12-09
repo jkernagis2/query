@@ -131,12 +131,61 @@ void *recv_thread_main(void *discard){
             //printf("<%s> %s\n", temp,buf);          // Prints incoming message
             if(strncmp(buf,"r_lookup",9) == 0){        // Check if we are doing a test
                 printf("Key %d has value: %s\n",buff.nid,buff.message);               // If so, generate logs based on our ID
-            nd_flag = 0;
+				nd_flag = 0;
             }else if(strncmp(buf,"dnf_lookup",11) == 0){
                printf("Key %d was not found.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"i_done",6) == 0){
+               printf("Key %d was inserted.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"u_done",6) == 0){
+               printf("Key %d was updated.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"d_done",6) == 0){
+               printf("Key %d was deleted.\n",buff.nid);
                nd_flag = 0;
             }
         }
     }
 }
+/*void *addr_thread_main(void *discard){
+    struct sockaddr_in fromaddr;
+    socklen_t len;
+    int nbytes;
+    char rIP[NI_MAXHOST];
+    char buf[1000];
+	char *temp;
+    addr_m buff;
+    char rbuff[1024];
+    for (;;) {
+        len = sizeof(fromaddr);
+		nbytes = recvfrom(reqfd,&buff,sizeof(addr_m),0,(struct sockaddr *)&fromaddr,&len);
+        if (nbytes < 0){
+            if (errno == EINTR)
+                continue;
+            perror("recvfrom");
+            exit(1);
+        }
+		
+        if(nbytes == 0){}
+        else{
 
+            if(strncmp(buf,"r_lookup",9) == 0){        // Check if we are doing a test
+                printf("Key %d has value: %s\n",buff.nid,buff.message);               // If so, generate logs based on our ID
+				nd_flag = 0;
+            }else if(strncmp(buf,"dnf_lookup",11) == 0){
+               printf("Key %d was not found.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"i_done",6) == 0){
+               printf("Key %d was inserted.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"u_done",6) == 0){
+               printf("Key %d was updated.\n",buff.nid);
+               nd_flag = 0;
+            }else if(strncmp(buf,"d_done",6) == 0){
+               printf("Key %d was deleted.\n",buff.nid);
+               nd_flag = 0;
+            }
+        }
+    }
+}*/

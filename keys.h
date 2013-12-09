@@ -22,10 +22,11 @@ extern my_id;
 extern struct sockaddr_in myaddr;
 extern int grepfd;
 extern sem_t test_lock;
+extern sem_t rep_lock;
 
 void local_insert(int key, char* val, int type);
 
-char* local_lookup(int key);
+char* local_lookup(int key, int type);
 
 void local_update(int key, char* new_val, int type);
 
@@ -42,6 +43,7 @@ void update(int key, char* new_val, int con_l);
 void delete_k(int key, int con_l);
 
 void shift_keys(ring_n* ring_pos, int pn);
+void log_keyop(int op, int key, char* value);
 
 ring_n* gnn(ring_n* ring_pos);
 ring_n* gpn(ring_n* current);

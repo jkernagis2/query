@@ -51,4 +51,7 @@ void *goss_recv_thread_main(void *discard);
 void *gossip_thread_main(void *discard);
 void *monitor_thread_main(void *discard);
 
+void dequeue_sockaddr_in_n(struct sockaddr_in* input, mess_s* message);
+void enqueue_sockaddr_in_n(struct sockaddr_in input, mess_s message);
+void handle_req();
 #endif

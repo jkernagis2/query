@@ -6,10 +6,14 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "keys.h"
-#define NUMTEST  20
+#define NUMTEST  2000
 volatile int lookup_requests = 0;
+int inserted_keys[NUMTEST];
+
+
 
 void local_insert(int key, char* value, int type){
+	log_keyop(1,key,value);
     // Allocate new keyval structure and linked list traversing pointers
     keyval* new_key = malloc(sizeof(keyval));
     keyval* current = mykv;
@@ -104,20 +108,63 @@ void local_insert(int key, char* value, int type){
         }
     }
 }
-char* local_lookup(int key){
+char* local_lookup(int key, int type){
+    
     keyval* current = mykv;
     lookup_requests++;
     while(current != NULL){
         if(current->key == key){
+            log_keyop(0,key,current->value);
+				if(type == 1){
+					int i;
+					struct sockaddr_in sendaddr;
+					memset(&sendaddr, '\0', sizeof(sendaddr));
+					sendaddr.sin_family = AF_INET;
+					sendaddr.sin_port = htons(9090);
+
+
+					mess_s message;
+					memset(&message,'\0',sizeof(message));
+					message.nid = key;
+					strncpy(message.command,"rep_lookup",10);
+					struct in_addr address[3];
+					get_rep_addr(key, address);
+					for(i = 0; i < 2; i++){
+						sendaddr.sin_addr = address[i+1];
+						sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+					}
+				}
             return current->value;
         }
         else{
             current = current->next;
         }
     }
+    log_keyop(0,key,"NaN\0");
+	if(type == 1){
+		int i;
+		struct sockaddr_in sendaddr;
+		memset(&sendaddr, '\0', sizeof(sendaddr));
+		sendaddr.sin_family = AF_INET;
+		sendaddr.sin_port = htons(9090);
+
+
+		mess_s message;
+		memset(&message,'\0',sizeof(message));
+		message.nid = key;
+		strncpy(message.command,"rep_look",9);
+		struct in_addr address[3];
+		get_rep_addr(key, address);
+		for(i = 0; i < 2; i++){
+			sendaddr.sin_addr = address[i+1];
+			sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
+		}
+	}
+	
     return NULL;
 }
 void local_update(int key, char* new_val, int type){
+	log_keyop(2,key,new_val);
     keyval* current = mykv;
     while(current != NULL){
         if(current->key == key){
@@ -135,7 +182,7 @@ void local_update(int key, char* new_val, int type){
 				mess_s message;
 				memset(&message,'\0',sizeof(message));
 				message.nid = key;
-				strncpy(message.command,"rep_update",9);
+				strncpy(message.command,"rep_update",10);
 				strncpy(message.message,new_val,strlen(new_val));
 				struct in_addr address[3];
 				get_rep_addr(key, address);
@@ -166,6 +213,7 @@ void local_delete(int key, int type){
             if(mykv == current){
                 mykv = current->next;
             }
+            log_keyop(3,key,current->value);
             free(current->value);
             free(current);
 			if(type == 1){
@@ -193,6 +241,7 @@ void local_delete(int key, int type){
             current = current->next;
         }
     }
+    log_keyop(3,key,"NaN\0");
     return;
 }
 void local_show(){
@@ -214,6 +263,35 @@ void local_show(){
     }
     printf("\nLookup Requests Recieved: %d\n",lookup_requests);
 
+}
+void local_ops(){
+    system("tail rw.log");
+}
+void log_keyop(int op, int key, char* value){
+    int i;
+    FILE* fp = fopen("rw.log","a");
+    if(fp == NULL)
+    {
+      printf("NULL\n");
+    }
+    
+    switch(op)
+    {
+        case 0:
+            fprintf(fp,"Lookup (Read : ");
+            break;
+        case 1:
+            fprintf(fp,"Insert (Write : ");
+            break;
+        case 2:
+            fprintf(fp,"Update (Write : " );
+            break;
+        case 3:
+            fprintf(fp,"Delete (Write : (");
+            break;
+    }
+    fprintf(fp,"%d , %s)\n",key,value); 
+    fclose(fp);
 }
 void insert(int key, char* val, int con_l){
     struct sockaddr_in sendaddr;
@@ -318,6 +396,7 @@ void shift_keys(ring_n* ring_pos, int pn){
             continue;
         }
         sendaddr.sin_addr = next_p->addr;
+		//sem_wait(&rep_lock);
         sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
         local_delete(temp->key, 0);
         temp = temp->next;
@@ -357,6 +436,7 @@ void leave_shift(ring_n* ring_pos){
 			while(1){}
 		}
 		sendaddr.sin_addr = next_p->addr;
+		//sem_wait(&rep_lock);
 		sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
 		local_delete(mykv->key, 0);
 		
@@ -399,6 +479,7 @@ void crash_shift(ring_n* ring_pos, int pn){
 			continue;
         }
 		sendaddr.sin_addr = next_p->addr;
+		//sem_wait(&rep_lock);
 		sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
 		temp = temp->next;
 	}
@@ -467,13 +548,36 @@ float elapsedTime(Timer timer) {
     return ((float) ((timer.endTime.tv_sec - timer.startTime.tv_sec) \
                 + (timer.endTime.tv_usec - timer.startTime.tv_usec)/1.0e6));
 }
+void test_insert(){
+    int i;
+    int random;
+    FILE* fp = fopen("test_insert.csv","w");
+    Timer timer;
+    memset(inserted_keys,'\0',1000);
+    for(i = 0; i < NUMTEST; i++){
+        //random = rand() % 1000001;
+        random = i;
+        inserted_keys[i] = random;
+        char buf[20];
+        memset(buf,'\0',20);
+        sprintf(buf, "%d", random);
+        sem_wait(&test_lock);
+        startTime(&timer);
+        insert(random,buf, 0);
+        sem_wait(&test_lock);
+        stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
+        sem_post(&test_lock);
+    }
+    fclose(fp);
+}
+
 void test_lookup(){
     int i;
     int random;
     FILE* fp = fopen("test_lookup.csv","w");
     Timer timer;
-    for(i = 0; i < NUMTEST; i++){
-        random = rand() % 1000001;
+    for(i = 0; i < 100; i++){
+        random = inserted_keys[rand() % NUMTEST];
         sem_wait(&test_lock);
         startTime(&timer);
         lookup(random, 0);
@@ -483,19 +587,20 @@ void test_lookup(){
     }
     fclose(fp);
 }
-void test_insert(){
+
+void test_update(){
     int i;
     int random;
-    FILE* fp = fopen("test_insert.csv","w");
+    FILE* fp = fopen("test_update.csv","w");
     Timer timer;
-    for(i = 0; i < NUMTEST; i++){
-        random = rand() % 1000001;
+    for(i = 0; i < 100; i++){
+        random = inserted_keys[rand() % NUMTEST];
         char buf[20];
         memset(buf,'\0',20);
         sprintf(buf, "%d", random);
         sem_wait(&test_lock);
         startTime(&timer);
-        insert(random,buf, 0);
+        update(random,buf, 0);
         sem_wait(&test_lock);
         stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
         sem_post(&test_lock);
@@ -535,6 +640,3 @@ ring_n* get_last(){
 	}
 	return last;
 }
-
-
-

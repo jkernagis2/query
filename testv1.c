@@ -69,11 +69,16 @@ int main(int argc, char **argv) {
         }else if(strncmp(str, "/show",5) == 0){
             local_show();
         }else if(strncmp(str, "/test",5) == 0){
-            test_lookup();
             test_insert();
-            local_show();
+            test_lookup();
+            test_update();
+            printf("Test completed!\n");
         }else if(strncmp(str, "/dump",5) == 0){
             dump_keys();
+        }else if(strncmp(str, "/populate",9) == 0){
+            test_insert();
+        }else if(strncmp(str, "/ops",4) == 0){
+            local_ops();
         }
 
         //multicast(str);

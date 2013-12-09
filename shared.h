@@ -63,4 +63,19 @@ typedef struct {
     struct timeval endTime;
 } Timer;
 
+typedef struct sockaddr_in_n{
+    struct sockaddr_in addr; //address
+    mess_s stored;
+    struct sockaddr_in_n* next;
+    struct sockaddr_in_n* prev;
+}sockaddr_in_n;
+
+
+/*typedef struct {
+    int key;
+	struct sockaddr_in addr;
+}addr_m;*/
+
+
+
 #endif

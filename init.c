@@ -32,6 +32,7 @@ volatile int server_flag;
 volatile int status[4];
 sem_t gossip_lock;
 sem_t test_lock;
+sem_t rep_lock;
 
 // Socket Descriptors
 int grepfd;
@@ -63,6 +64,12 @@ int replicas;
 int past_gossips;
 
 int replys;
+struct sockaddr_in lastaddr;
+mess_s lastmess;
+char * lastlookup;
+int waiting;
+sockaddr_in_n* sa_front;
+sockaddr_in_n* sa_back;
 
 
 void init(int type, char * servIP){
@@ -111,6 +118,8 @@ void init(int type, char * servIP){
     /* Initialize the semaphore */
     sem_init(&gossip_lock,0,1);
     sem_init(&test_lock,0,1);
+	sem_init(&rep_lock,0,1);
+	
 
     /*Setting Up Gossip List*/
     num_machines = 0;
@@ -163,6 +172,9 @@ void init(int type, char * servIP){
     init_ring();
     replicas = 0;
     past_gossips = 0;
+    sa_front = NULL;
+    sa_back = NULL;
+    waiting = 0;
 
 }
 void getIP(){
@@ -574,13 +586,32 @@ void *grep_recv_thread_main(void *discard){
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
                 else if(strncmp(buf,"insert",6) == 0){
-                    local_insert(buff.nid, buff.message,1);
-                    mess_s ret;
-                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
-                    ret.nid = buff.nid;
-                    strcpy(ret.command, "i_done");
-
-                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+				//printf("Populate %d\n", waiting);
+                    if(waiting == 0)
+                    {
+                        local_insert(buff.nid, buff.message,1);
+						//printf("Populate\n");
+                        if(buff.bytes_sent == 0)
+                        {
+						//printf("Populate 2\n");
+                            mess_s ret;
+                            memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                            ret.nid = buff.nid;
+                            strcpy(ret.command, "i_done");
+                            sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                        }
+                        else {
+                            replys = buff.bytes_sent;
+                            memcpy(&lastaddr, &fromaddr, sizeof(fromaddr));
+                            memcpy(&lastmess, &buff, sizeof(mess_s));
+                            waiting++; 
+                        }
+                    }
+                    else
+                    {
+                        enqueue_sockaddr_in_n(fromaddr, buff);
+                        waiting++;
+                    }
                 }
                 else if(strncmp(buf,"replicate",9) == 0){
                     local_insert(buff.nid, buff.message,0);
@@ -588,48 +619,148 @@ void *grep_recv_thread_main(void *discard){
                     /*mess_s ret;
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
                     ret.nid = buff.nid;
-                    strcpy(ret.command, "i_done");
+                    strcpy(ret.command, "rep_reply");
 
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));*/
                 }
                 else if(strncmp(buf,"lookup",6) == 0){
-                    mess_s ret;
+                    if(waiting == 0)
+                    {
+                        if(buff.bytes_sent == 0)
+                        {
+                            mess_s ret;
+                            memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                            ret.nid = buff.nid;
+                            lastlookup = local_lookup(buff.nid, 1);
+                            if(lastlookup != NULL){
+                                strcpy(ret.command, "r_lookup");
+                                strcpy(ret.message,lastlookup);
+                            }
+                            else{
+                                strcpy(ret.command, "dnf_lookup");
+                            }
+
+                            sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                        }
+                        else{
+                            replys = buff.bytes_sent;
+                            memcpy(&lastaddr, &fromaddr, sizeof(fromaddr));
+                            memcpy(&lastmess, &buff, sizeof(mess_s));
+                            waiting++; 
+                        }
+                    }
+                    else
+                    {
+                        enqueue_sockaddr_in_n(fromaddr, buff);
+                        waiting++;
+                    }
+                }
+				else if(strncmp(buf,"rep_lookup",10) == 0){
+				    char *  test = local_lookup(buff.nid, 0);
+					mess_s ret;
                     memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
                     ret.nid = buff.nid;
-                    char* looked_up = local_lookup(buff.nid);
-                    if(looked_up != NULL){
-                        strcpy(ret.command, "r_lookup");
-                        strcpy(ret.message,looked_up);
-                    }
-                    else{
-                        strcpy(ret.command, "dnf_lookup");
-                    }
+                    strcpy(ret.command, "rep_reply");
 
                     sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
-                }
-                else if(strncmp(buf,"update",6) == 0){
-                    local_update(buff.nid, buff.message,1);
+				}
+				else if(strncmp(buf,"update",6) == 0){
+                   if(waiting == 0)
+                    {
+                        local_update(buff.nid, buff.message,1);
+                        if(buff.bytes_sent == 0)
+                        {
+                            mess_s ret;
+                            memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                            ret.nid = buff.nid;
+                            strcpy(ret.command, "u_done");
+
+                            sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                        }
+                        else {
+
+                            replys = buff.bytes_sent;
+                            memcpy(&lastaddr, &fromaddr, sizeof(fromaddr));
+                            memcpy(&lastmess, &buff, sizeof(mess_s));
+                            waiting++; 
+                        }
+                    }
+                    else
+                    {
+                        enqueue_sockaddr_in_n(fromaddr, buff);
+                        waiting++;
+                    }
                 }
 				else if(strncmp(buf,"rep_update",10) == 0){
                     local_update(buff.nid, buff.message,0);
+					mess_s ret;
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    ret.nid = buff.nid;
+                    strcpy(ret.command, "rep_reply");
+
+                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
 				}
                 else if(strncmp(buf,"delete",6) == 0){
-                    local_delete(buff.nid, 1);
+                   if(waiting == 0)
+                    {
+                        local_delete(buff.nid,1);
+                        if(buff.bytes_sent == 0)
+                        {
+                            mess_s ret;
+                            memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                            ret.nid = buff.nid;
+                            strcpy(ret.command, "d_done");
+
+                            sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
+                        }
+                        else {
+
+                            replys = buff.bytes_sent;
+                            memcpy(&lastaddr, &fromaddr, sizeof(fromaddr));
+                            memcpy(&lastmess, &buff, sizeof(mess_s));
+                            waiting++;
+                        }
+                    }
+                    else
+                    {
+                        enqueue_sockaddr_in_n(fromaddr, buff);
+                        waiting++;
+                    }
                 }
 				else if(strncmp(buf,"rep_delete",10) == 0){
                     local_delete(buff.nid, 0);
 					replicas--;
+					mess_s ret;
+                    memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+                    ret.nid = buff.nid;
+                    strcpy(ret.command, "rep_reply");
+
+                    sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &fromaddr, sizeof(fromaddr));
                 }
-                else if(strncmp(buf,"r_lookup",8) == 0){
+	
+				else if(strncmp(buf,"r_lookup",8) == 0){
                    //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
                    printf("Key %d has value: %s\n",buff.nid,buff.message);
                    sem_post(&test_lock);
-                }else if(strncmp(buf,"dnf_lookup",10) == 0){
+                }
+				else if(strncmp(buf,"dnf_lookup",10) == 0){
                    //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
                    printf("Key %d was not found.\n",buff.nid);
                    sem_post(&test_lock);
-                }else if(strncmp(buf,"i_done",6) == 0){
+                }
+				else if(strncmp(buf,"i_done",6) == 0){
+				   //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
                    printf("Key insert finished.\n");
+                   sem_post(&test_lock);
+                }
+				else if(strncmp(buf,"u_done",6) == 0){
+				   //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   printf("Key update finished.\n");
+                   sem_post(&test_lock);
+                }
+				else if(strncmp(buf,"d_done",6) == 0){
+				   //sendto(grepfd, &buff, sizeof(mess_s), 0, (struct sockaddr *) &retaddr, sizeof(retaddr));
+                   printf("Key delete finished.\n");
                    sem_post(&test_lock);
                 }
 
@@ -646,6 +777,17 @@ void *grep_recv_thread_main(void *discard){
                 }else if(strncmp(buf,"s_delete",8) == 0){
                     delete_k(buff.nid, buff.bytes_sent);
                 }
+                    
+                /*Replicate Replys*/
+                else if(strncmp(buf,"rep_reply",9) == 0){
+                    replys--;
+                    if(replys == 0){
+						handle_req();
+                    }
+                }
+    
+
+
             }
     }
 }
@@ -837,6 +979,99 @@ void *monitor_thread_main(void *discard){
 
 
 }
+void enqueue_sockaddr_in_n(struct sockaddr_in input, mess_s message){
+    sockaddr_in_n* temp = malloc(sizeof(sockaddr_in_n));
+    temp->addr = input;
+    memcpy(&temp->stored, &message, sizeof(mess_s));
+    temp->prev = NULL;
+    if(sa_back != NULL){
+        temp->next = sa_back;
+        sa_back->prev = temp;
+        sa_back = temp;
+    }
+    else{
+        sa_back = temp;
+        sa_front = temp;
+    }
+    return;
+}
+void dequeue_sockaddr_in_n(struct sockaddr_in* input, mess_s* message){
+    if(sa_front == NULL){
+        input = NULL;
+        return;
+    }
+    *input = sa_front->addr;
+    memcpy(input, &sa_front->addr, sizeof(struct sockaddr_in));
+    memcpy(message,&sa_front->stored, sizeof(mess_s));
+    sockaddr_in_n* temp = sa_front;
+    if(sa_front->prev != NULL){
+        sa_front->prev->next = NULL;
+        sa_front = sa_front->prev;
+    }
+    else{
+        sa_front = NULL;
+    }
+    free(temp);
+    
+    return;
+}
+void handle_req(){
+	
+	mess_s ret;
+	memset(&ret,'\0',sizeof(mess_s));   // Clear the message structure
+	struct sockaddr_in replyaddr;
+	
+	while(replys == 0 && waiting > 0){
+		memcpy(&replyaddr,&lastaddr, sizeof(lastaddr));
+		memcpy(&ret, &lastmess, sizeof(mess_s));
+		
+		if(strncmp(lastmess.command,"insert",6) == 0){
+			strcpy(ret.command, "i_done");
+		}else if(strncmp(lastmess.command,"lookup",6) == 0){
+			if(lastlookup != NULL){
+				strcpy(ret.command, "r_lookup");
+				strcpy(ret.message,lastlookup);
+			}
+			else{
+				strcpy(ret.command, "dnf_lookup");
+			}
+		}else if(strncmp(lastmess.command,"update",6) == 0){
+			strcpy(ret.command, "u_done");
+		}else if(strncmp(lastmess.command,"delete",6) == 0){
+			strcpy(ret.command, "d_done");
+		}
+		sendto(grepfd, &ret, sizeof(mess_s), 0, (struct sockaddr *) &lastaddr, sizeof(lastaddr));
+		waiting--;
+		if(waiting > 0){
+			dequeue_sockaddr_in_n(&lastaddr, &lastmess);
+			if(strncmp(lastmess.command,"insert",6) == 0){
+			  local_insert(lastmess.nid, lastmess.message,1);
+			}else if(strncmp(lastmess.command,"lookup",6) == 0){
+			   lastlookup = local_lookup(lastmess.nid,1);
+			}else if(strncmp(lastmess.command,"update",6) == 0){
+                local_update(lastmess.nid, lastmess.message,1);
+			}else if(strncmp(lastmess.command,"delete",6) == 0){
+			  local_delete(lastmess.nid,1);
+			}
+			replys = lastmess.bytes_sent;
+		}
+
+		
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
