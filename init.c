@@ -60,6 +60,7 @@ void delete_ring();
 void init_ring();
 
 int replicas;
+int past_gossips;
 
 void init(int type, char * servIP){
     int i,n;
@@ -158,6 +159,7 @@ void init(int type, char * servIP){
     /*Ring Initialization*/
     init_ring();
     replicas = 0;
+    past_gossips = 0;
 
 }
 void getIP(){
@@ -332,6 +334,7 @@ void set_leave(){
     /*Ring Management*/
     remove_from_ring(gossip_list[0].ring_id, 0);
     delete_ring();
+    past_gossips = 0;
     
     sem_post(&gossip_lock);//endlock
 	// Clear local membership list from [2] to [END]
@@ -403,20 +406,20 @@ void add_to_ring(int newid, struct in_addr new_addr){
     if(myring == n_node->next){
         myring = n_node;
     }
-
-    if(gossip_list[0].ring_id == gnn(n_node)->value){
-        printf("Shift Next 1");
-        shift_keys(n_node, 0);
+    if(past_gossips != 0){
+        if(gossip_list[0].ring_id == gnn(n_node)->value){
+            printf("Shift Next 1\n");
+            shift_keys(n_node, 0);
+        }
+        else if(gossip_list[0].ring_id == gnn(gnn(n_node))->value){
+            printf("Shift Next 2\n");
+            shift_keys(n_node, 1);
+        }
+        else if(gossip_list[0].ring_id == gnn(gnn(gnn(n_node)))->value){
+            printf("Shift Next 3\n");
+            shift_keys(n_node, 2);
+        }
     }
-    else if(gossip_list[0].ring_id == gnn(gnn(n_node))->value){
-        printf("Shift Next 2");
-        shift_keys(n_node, 1);
-    }
-    else if(gossip_list[0].ring_id == gnn(gnn(gnn(n_node)))->value){
-        printf("Shift Next 3");
-        shift_keys(n_node, 2);
-    }
-
 
 
     /*if(n_node->next !=NULL)
@@ -726,8 +729,8 @@ void *goss_recv_thread_main(void *discard){
                 }
 
             }
-
-        sem_post(&gossip_lock);//endlock
+            past_gossips++;
+            sem_post(&gossip_lock);//endlock
         }
     }
 }

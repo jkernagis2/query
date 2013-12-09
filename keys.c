@@ -297,6 +297,7 @@ void shift_keys(ring_n* ring_pos, int pn){
         strncpy(message.message,temp->value,strlen(temp->value));
         get_rep_addr(temp->key, address);
         if(address[0].s_addr == ring_pos->addr.s_addr && pn  == 2){
+            
             next_p = ring_pos;
         }
         else if(address[1].s_addr == ring_pos->addr.s_addr && pn == 1)
@@ -315,33 +316,7 @@ void shift_keys(ring_n* ring_pos, int pn){
         sendaddr.sin_addr = next_p->addr;
         sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr));
         local_delete(temp->key, 0);
-
         temp = temp->next;
-    }
-}
-void move_keys(){
-    keyval* temp = mykv;
-    keyval* temp_next;
-	mykv == NULL;
-    while(temp != NULL)
-    {
-        temp_next = temp->next;
-        insert(temp->key, temp->value);
-        local_delete(temp->key, 0);
-        temp = temp_next;
-    }
-}
-void fix_keys(){
-	keyval* temp = mykv;
-    keyval* temp_next;
-	mykv = NULL;
-    while(temp != NULL)
-    {
-        temp_next = temp->next;
-        insert(temp->key, temp->value);
-		free(temp->value);
-		free(temp);
-        temp = temp_next;
     }
 }
 void leave_shift(ring_n* ring_pos){
