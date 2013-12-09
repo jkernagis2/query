@@ -57,15 +57,15 @@ int main(int argc, char **argv) {
         }else if(strncmp(str, "/insert",7) == 0){
             for(i = 8; str[i] != ' '; i++){}
             strncpy(key,&str[8], i-8);
-        	insert(atoi(key), &str[i+1]);
+        	insert(atoi(key), &str[i+1], 0);
         }else if(strncmp(str, "/lookup",7) == 0){
-        	lookup(atoi(&str[8]));
+        	lookup(atoi(&str[8]),0);
         }else if(strncmp(str, "/update",7) == 0){
             for(i = 8; str[i] != ' '; i++){}
             strncpy(key,&str[8], i-8);
-        	update(atoi(key), &str[i+1]);
+        	update(atoi(key), &str[i+1], 0);
         }else if(strncmp(str, "/delete",7) == 0){
-        	delete_k(atoi(&str[8]));
+        	delete_k(atoi(&str[8]), 0);
         }else if(strncmp(str, "/show",5) == 0){
             local_show();
         }else if(strncmp(str, "/test",5) == 0){

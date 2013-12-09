@@ -62,6 +62,9 @@ void init_ring();
 int replicas;
 int past_gossips;
 
+int replys;
+
+
 void init(int type, char * servIP){
     int i,n;
     int sockoptval = 1;
@@ -420,22 +423,6 @@ void add_to_ring(int newid, struct in_addr new_addr){
             shift_keys(n_node, 2);
         }
     }
-
-
-    /*if(n_node->next !=NULL)
-    {
-        if(my_id == (n_node->next)->value)
-        {
-            shift_keys();
-        }
-    }
-    else{
-        if(my_id == myring->value)
-        {
-            shift_keys();
-        }
-    }*/
-
 }
 void remove_from_ring(int id, int type){
     
@@ -649,15 +636,15 @@ void *grep_recv_thread_main(void *discard){
 
                 /*External Calls*/
                 else if(strncmp(buf,"s_insert",8) == 0){
-                    insert(buff.nid, buff.message);
+                    insert(buff.nid, buff.message, buff.bytes_sent);
                 }else if(strncmp(buf,"s_lookup",8) == 0){
-                    lookup(buff.nid);
+                    lookup(buff.nid, buff.bytes_sent);
                     memset(&retaddr, 0, sizeof(retaddr));
                     memcpy(&retaddr, &fromaddr, sizeof(struct sockaddr_in));
                 }else if(strncmp(buf,"s_update",8) == 0){
-                    update(buff.nid, buff.message);
+                    update(buff.nid, buff.message, buff.bytes_sent);
                 }else if(strncmp(buf,"s_delete",8) == 0){
-                    delete_k(buff.nid);
+                    delete_k(buff.nid, buff.bytes_sent);
                 }
             }
     }

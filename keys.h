@@ -33,13 +33,13 @@ void local_delete(int key, int type);
 
 void local_show();
 
-void insert(int key, char* val);
+void insert(int key, char* val, int con_l);
 
-void lookup(int key);
+void lookup(int key, int con_l);
 
-void update(int key, char* new_val);
+void update(int key, char* new_val, int con_l);
 
-void delete_k(int key);
+void delete_k(int key, int con_l);
 
 void shift_keys(ring_n* ring_pos, int pn);
 

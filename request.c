@@ -29,7 +29,7 @@ pthread_t recv_thread;
 //Global Flag
 int nd_flag;
 
-void send_req(char * request, int key, char * value){
+void send_req(char * request, int key, char * value, int consistency){
     int i,n;
     int sockoptval = 1;
     getIP();
@@ -73,6 +73,7 @@ void send_req(char * request, int key, char * value){
         strcpy(req.message, value);
     }
     req.nid = key;
+    req.bytes_sent = consistency;
     sendto(reqfd, &req, sizeof(mess_s), 0,(struct sockaddr *) &lservaddr, sizeof(lservaddr));
     while(nd_flag){}
 }

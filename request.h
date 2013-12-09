@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 
-void send_req(char * request, int key, char * value);
+void send_req(char * request, int key, char * value, int consistency);
 void getIP();
 void *recv_thread_main(void *discard);
 

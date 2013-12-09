@@ -215,7 +215,7 @@ void local_show(){
     printf("\nLookup Requests Recieved: %d\n",lookup_requests);
 
 }
-void insert(int key, char* val){
+void insert(int key, char* val, int con_l){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -226,12 +226,13 @@ void insert(int key, char* val){
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
+    message.bytes_sent = con_l;
     strncpy(message.command,"insert",6);
     strncpy(message.message,val,strlen(val));
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-void lookup(int key){
+void lookup(int key, int con_l){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -242,11 +243,12 @@ void lookup(int key){
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
+    message.bytes_sent = con_l;
     strncpy(message.command,"lookup",6);
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-void update(int key, char* new_val){
+void update(int key, char* new_val, int con_l){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -257,12 +259,13 @@ void update(int key, char* new_val){
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
+    message.bytes_sent = con_l;
     strncpy(message.command,"update",6);
     strncpy(message.message,new_val,strlen(new_val));
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
 }
-void delete_k(int key){
+void delete_k(int key, int con_l){
     struct sockaddr_in sendaddr;
     memset(&sendaddr, '\0', sizeof(sendaddr));
     sendaddr.sin_family = AF_INET;
@@ -273,6 +276,7 @@ void delete_k(int key){
     mess_s message;
     memset(&message,'\0',sizeof(message));
     message.nid = key;
+    message.bytes_sent = con_l;
     strncpy(message.command,"delete",6);
 
     sendto(grepfd, &message, sizeof(mess_s), 0,(struct sockaddr *) &sendaddr, sizeof(sendaddr)) ;
@@ -472,7 +476,7 @@ void test_lookup(){
         random = rand() % 1000001;
         sem_wait(&test_lock);
         startTime(&timer);
-        lookup(random);
+        lookup(random, 0);
         sem_wait(&test_lock);
         stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
         sem_post(&test_lock);
@@ -491,7 +495,7 @@ void test_insert(){
         sprintf(buf, "%d", random);
         sem_wait(&test_lock);
         startTime(&timer);
-        insert(random,buf);
+        insert(random,buf, 0);
         sem_wait(&test_lock);
         stopTime(&timer); fprintf(fp,"%f\n", elapsedTime(timer));
         sem_post(&test_lock);
